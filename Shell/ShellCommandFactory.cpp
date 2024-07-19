@@ -1,26 +1,30 @@
-﻿// Copyright [2024] <CRA/BestReviewer>
+﻿// Copyright.2024.binaryfalse81@gmail.com
 #include "ShellCommandFactory.h"
-#include "../Logger/logger.cpp"
+#include "../Logger/Logger.cpp"
 
 using namespace std;
 
-ShellCommand* ShellCommandFactory::Make(const string& strCommand) {
+ShellCommand* ShellCommandFactory::Make(const string& strCommand)
+{
     TokenArgument(strCommand);
     MakeCommand();
     return result;
 }
 
-void ShellCommandFactory::SetSsdDriver(SsdDriver* ssddriver) {
-    this->ssddriver = ssddriver;
+void ShellCommandFactory::SetSsdDriver(SSDDriver* sd)
+{
+    this->sd = sd;
 }
 
-void ShellCommandFactory::TokenArgument(const string& strCommand) {
+void ShellCommandFactory::TokenArgument(const string& strCommand)
+{
     LOG_PRINT("Separate commands into tokens");
     string token;
     size_t start = 0, end = 0;
     CommandToken.clear();
 
-    while ((end = strCommand.find(' ', start)) != string::npos) {
+    while ((end = strCommand.find(' ', start)) != string::npos)
+    {
         token = strCommand.substr(start, end - start);
         CommandToken.push_back(token);
         start = end + 1;
@@ -31,7 +35,8 @@ void ShellCommandFactory::TokenArgument(const string& strCommand) {
     CommandToken.push_back(token);
 }
 
-void ShellCommandFactory::MakeCommand() {
+void ShellCommandFactory::MakeCommand()
+{
     LOG_PRINT("Generate the appropriate command");
     if (CommandToken.empty() == true) result = MakeInvalidCommand();
     else if (CommandToken[0] == "write") result = MakeWriteCommand();
@@ -44,34 +49,38 @@ void ShellCommandFactory::MakeCommand() {
     else if (CommandToken[0] == "help") result = MakeHelpCommand();
     else if (CommandToken[0] == "fullwrite") result = MakeFullWriteCommand();
     else if (CommandToken[0] == "fullread") result = MakeFullReadCommand();
-    else if (CommandToken[0] == "testapp1") result = MakeTestApp1Command();
-    else if (CommandToken[0] == "testapp2") result = MakeTestApp2Command();
     else if (CommandToken[0] == "compare") result = MakeCompareCommand();
     else
         result = MakeInvalidCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeInvalidCommand() {
+ShellCommand* ShellCommandFactory::MakeInvalidCommand()
+{
     return new InvalidCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeWriteCommand() {
+ShellCommand* ShellCommandFactory::MakeWriteCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 3) {
+    if (CommandToken.size() != 3)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 2) LBA
-    if (IsStringDecimal(CommandToken[1]) == false) {
+    if (IsStringDecimal(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLBA(CommandToken[1]) == false) {
+    if (IsStringValidLBA(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 3) Data
-    if (IsStringHexadecimal(CommandToken[2]) == false) {
+    if (IsStringHexadecimal(CommandToken[2]) == false)
+    {
         return new InvalidCommand();
     }
 
@@ -79,199 +88,222 @@ ShellCommand* ShellCommandFactory::MakeWriteCommand() {
 }
 
 
-ShellCommand* ShellCommandFactory::MakeReadCommand() {
+ShellCommand* ShellCommandFactory::MakeReadCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 2) {
+    if (CommandToken.size() != 2)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 2) LBA
-    if (IsStringDecimal(CommandToken[1]) == false) {
+    if (IsStringDecimal(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLBA(CommandToken[1]) == false) {
+    if (IsStringValidLBA(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
     return new ReadCommand(CommandToken[1]);
 }
 
-ShellCommand* ShellCommandFactory::MakeEraseCommand() {
+ShellCommand* ShellCommandFactory::MakeEraseCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 3) {
+    if (CommandToken.size() != 3)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 2) LBA
-    if (IsStringDecimal(CommandToken[1]) == false) {
+    if (IsStringDecimal(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLBA(CommandToken[1]) == false) {
+    if (IsStringValidLBA(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 3) Size
-    if (IsStringDecimal(CommandToken[2]) == false) {
+    if (IsStringDecimal(CommandToken[2]) == false)
+    {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLength(CommandToken[2]) == false) {
+    if (IsStringValidLength(CommandToken[2]) == false)
+    {
         return new InvalidCommand();
     }
 
     return new EraseCommand(CommandToken[1], CommandToken[2]);
 }
 
-ShellCommand* ShellCommandFactory::MakeEraseRangeCommand() {
+ShellCommand* ShellCommandFactory::MakeEraseRangeCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 3) {
+    if (CommandToken.size() != 3)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 2) StartLBA
-    if (IsStringDecimal(CommandToken[1]) == false) {
+    if (IsStringDecimal(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLBA(CommandToken[1]) == false) {
+    if (IsStringValidLBA(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 3) EndLBA
-    if (IsStringDecimal(CommandToken[2]) == false) {
+    if (IsStringDecimal(CommandToken[2]) == false)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 4) Size
-    if (IsStringValidLength(CommandToken[1], CommandToken[2]) == false) {
+    if (IsStringValidLength(CommandToken[1], CommandToken[2]) == false)
+    {
         return new InvalidCommand();
     }
 
     return new EraseRangeCommand(LimitToMinLBA(CommandToken[1]), LimitToMaxLBA(CommandToken[2]));
 }
 
-ShellCommand* ShellCommandFactory::MakeFlushCommand() {
+ShellCommand* ShellCommandFactory::MakeFlushCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 1) {
+    if (CommandToken.size() != 1)
+    {
         return new InvalidCommand();
     }
 
     return new FlushCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeExitCommand() {
+ShellCommand* ShellCommandFactory::MakeExitCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 1) {
+    if (CommandToken.size() != 1)
+    {
         return new InvalidCommand();
     }
 
     return new ExitCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeFailCommand() {
+ShellCommand* ShellCommandFactory::MakeFailCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 1) {
+    if (CommandToken.size() != 1)
+    {
         return new InvalidCommand();
     }
 
     return new FailCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeHelpCommand() {
+ShellCommand* ShellCommandFactory::MakeHelpCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 1) {
+    if (CommandToken.size() != 1)
+    {
         return new InvalidCommand();
     }
 
     return new HelpCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeFullWriteCommand() {
+ShellCommand* ShellCommandFactory::MakeFullWriteCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 2) {
+    if (CommandToken.size() != 2)
+    {
         return new InvalidCommand();
     }
 
     // Check Invalid 2) Data
-    if (IsStringHexadecimal(CommandToken[1]) == false) {
+    if (IsStringHexadecimal(CommandToken[1]) == false)
+    {
         return new InvalidCommand();
     }
 
     return new FullWriteCommand(CommandToken[1]);
 }
 
-ShellCommand* ShellCommandFactory::MakeFullReadCommand() {
+ShellCommand* ShellCommandFactory::MakeFullReadCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 1) {
+    if (CommandToken.size() != 1)
+    {
         return new InvalidCommand();
     }
 
     return new FullReadCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeTestApp1Command() {
+ShellCommand* ShellCommandFactory::MakeCompareCommand()
+{
     // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 1) {
-        return new InvalidCommand();
-    }
-
-    return new TestApp1();
-}
-
-ShellCommand* ShellCommandFactory::MakeTestApp2Command() {
-    // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 1) {
-        return new InvalidCommand();
-    }
-
-    return new TestApp2();
-}
-
-ShellCommand* ShellCommandFactory::MakeCompareCommand() {
-    // Check Invalid 1) Argument Length
-    if (CommandToken.size() != 1) {
+    if (CommandToken.size() != 1)
+    {
         return new InvalidCommand();
     }
 
     return new Compare();
 }
 
-bool ShellCommandFactory::IsStringDecimal(const string& str) {
-    for (char ch = 0; ch < str.size(); ch++) {
-        if ('0' > str[ch] || str[ch] > '9') {
+bool ShellCommandFactory::IsStringDecimal(const string& str)
+{
+    for (char ch = 0; ch < str.size(); ch++)
+    {
+        if ('0' > str[ch] || str[ch] > '9')
+        {
             return false;
         }
     }
     return true;
 }
 
-bool ShellCommandFactory::IsStringHexadecimal(const string& str) {
+bool ShellCommandFactory::IsStringHexadecimal(const string& str)
+{
     if ((str[0] != '0') ||
         (str[1] != 'x') ||
-        (str.size() != MAX_STR_LENGTH_DATA)) {
+        (str.size() != MAX_STR_LENGTH_DATA))
+    {
         return false;
     }
 
-    for (int idx = 2; idx < str.size(); idx++) {
+    for (int idx = 2; idx < str.size(); idx++)
+    {
         if (('0' > str[idx] || str[idx] > '9') &&
-            ('A' > str[idx] || str[idx] > 'F')) {
+            ('A' > str[idx] || str[idx] > 'F'))
+        {
             return false;
         }
     }
     return true;
 }
 
-bool ShellCommandFactory::IsStringValidLBA(const string& str) {
+bool ShellCommandFactory::IsStringValidLBA(const string& str)
+{
     int LBA = stoi(str);
-    if ((ssddriver->GetMinLBA() <= LBA) && (LBA <= ssddriver->GetMaxLBA())) {
+    if ((sd->GetMinLBA() <= LBA) && (LBA <= sd->GetMaxLBA()))
+    {
         return true;
     }
     return false;
 }
 
-bool ShellCommandFactory::IsStringValidLength(const string& str) {
+bool ShellCommandFactory::IsStringValidLength(const string& str)
+{
     return (stoi(str) > 0);
 }
 
@@ -281,19 +313,23 @@ bool ShellCommandFactory::IsStringValidLength(const string& strStartLBA, const s
 }
 
 
-string ShellCommandFactory::LimitToMinLBA(const string& str) {
+string ShellCommandFactory::LimitToMinLBA(const string& str)
+{
     int LBA = stoi(str);
-    if (LBA < ssddriver->GetMinLBA()) {
-        LBA = ssddriver->GetMinLBA();
+    if (LBA < sd->GetMinLBA())
+    {
+        LBA = sd->GetMinLBA();
     }
 
     return to_string(LBA);
 }
 
-string ShellCommandFactory::LimitToMaxLBA(const string& str) {
+string ShellCommandFactory::LimitToMaxLBA(const string& str)
+{
     int LBA = stoi(str);
-    if (LBA > ssddriver->GetMaxLBA() + 1) {
-        LBA = ssddriver->GetMaxLBA() + 1;
+    if (LBA > sd->GetMaxLBA() + 1)
+    {
+        LBA = sd->GetMaxLBA() + 1;
     }
 
     return to_string(LBA);

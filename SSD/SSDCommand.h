@@ -1,4 +1,4 @@
-// Copyright [2024] <CRA/BestReviewer>
+// Copyright.2024.binaryfalse81@gmail.com
 #pragma once
 #include <vector>
 #include <string>
@@ -6,14 +6,14 @@
 #include "Parser.h"
 #include "SSDInterface.h"
 
-class SSDCommand {
- public:
+class SSDCommand
+{
+public:
     SSDCommand(SSDInterface* ssd, Parser* parser, CmdStatus* cmd)
-        : ssd(ssd), parser(parser), cmd(cmd) {
-    }
-    void Run(const std::string& str);
+        : ssd(ssd), parser(parser), cmd(cmd) {}
+    void Run(const string& str);
 
- private:
+private:
     SSDInterface *ssd;
     Parser* parser;
     CmdStatus* cmd;

@@ -1,21 +1,22 @@
-// Copyright [2024] <CRA/BestReviewer>
+// Copyright.2024.binaryfalse81@gmail.com
 #pragma once
 #include <vector>
 #include <string>
 #include <cstring>
 #include <iostream>
-#include "SsdDriver.h"
+#include "SSDDriver.h"
 #include "ShellCommandFactory.h"
 
 using namespace std;
 
-class Shell {
- public:
+class Shell
+{
+public:
     void Run(const string& str);
-    void SetSsdDriver(SsdDriver* ssddriver);
+    void SetSsdDriver(SSDDriver* sd);
 
- private:
-    SsdDriver* ssddriver;
+private:
+    SSDDriver* ssdDriver;
     ShellCommandFactory shellCommandFactory;
     ShellCommand* shellCommand;
 };

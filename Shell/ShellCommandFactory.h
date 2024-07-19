@@ -1,17 +1,20 @@
-// Copyright [2024] <CRA/BestReviewer>
+// Copyright.2024.binaryfalse81@gmail.com
 #pragma once
 #include <vector>
 #include <string>
 #include "ShellCommand.h"
-#include "SsdDriver.h"
+#include "SSDDriver.h"
 
-class ShellCommandFactory {
- public:
+class ShellCommandFactory
+{
+public:
     ShellCommand* Make(const string& strCommand);
-    void SetSsdDriver(SsdDriver* ssddriver);
- protected:
-    SsdDriver* ssddriver;
- private:
+    void SetSsdDriver(SSDDriver* sd);
+
+protected:
+    SSDDriver* sd;
+
+private:
     void TokenArgument(const string& strCommand);
     void MakeCommand();
     ShellCommand* MakeInvalidCommand();

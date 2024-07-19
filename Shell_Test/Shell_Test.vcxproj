@@ -109,6 +109,9 @@
     <ProjectReference Include="..\Shell\Shell.vcxproj">
       <Project>{b12dfcbd-722f-4860-a9a4-ad400b037ce9}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\SSD\SSD.vcxproj">
+      <Project>{257d1023-3d32-47e1-b6d4-5318e53a9b5e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

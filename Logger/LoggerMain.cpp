@@ -1,3 +1,4 @@
-// Copyright [2024] <CRA/BestReviewer>
-int main() {
+// Copyright.2024.binaryfalse81@gmail.com
+int main()
+{
 }

@@ -1,28 +1,34 @@
-// Copyright [2024] <CRA/BestReviewer>
-#include "Shell.h"
-#include "SsdDriver.h"
+// Copyright.2024.binaryfalse81@gmail.com
 #include <string>
+#include "Shell.h"
+#include "SSDDriver.h"
 
-void Shell::Run(const string& strCommand) {
+void Shell::Run(const string& strCommand)
+{
     shellCommand = shellCommandFactory.Make(strCommand);
 
-    try {
-        shellCommand->Run(ssddriver);
+    try
+    {
+        shellCommand->Run(ssdDriver);
     }
-    catch (FailTestShell) {
+    catch (FailTestShell)
+    {
         throw FailTestShell();
     }
-    catch (ExitTestShell) {
+    catch (ExitTestShell)
+    {
         throw ExitTestShell();
     }
-    catch (ExceptionCompareFail) {
+    catch (ExceptionCompareFail)
+    {
         throw ExceptionCompareFail();
     }
 
     delete(shellCommand);
 }
 
-void Shell::SetSsdDriver(SsdDriver* ssddriver) {
-    this->ssddriver = ssddriver;
-    shellCommandFactory.SetSsdDriver(ssddriver);
+void Shell::SetSsdDriver(SSDDriver* sd)
+{
+    this->ssdDriver = sd;
+    shellCommandFactory.SetSsdDriver(sd);
 }

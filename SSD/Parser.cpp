@@ -1,22 +1,25 @@
-// Copyright [2024] <CRA/BestReviewer>
+// Copyright.2024.binaryfalse81@gmail.com
 #include<stdexcept>
 #include"Parser.h"
 #include "../Logger/Logger.cpp"
 
-class ArgsLengthNotMatchException : public std::exception {};
+class ArgsLengthNotMatchException : public exception {};
 
-CmdStatus *Parser::Parse(const std::string &strCommand) {
+CmdStatus *Parser::Parse(const string &strCommand)
+{
     TokenArgument(strCommand);
     return UpdateCmdStatus();
 }
 
-void Parser::TokenArgument(const std::string& strCommand) {
+void Parser::TokenArgument(const string& strCommand)
+{
     LOG_PRINT("Separate commands into tokens");
-    std::string token;
+    string token;
     size_t start = strCommand.find(' ', 0) + 1;
     size_t end = start;
 
-    while ((end = strCommand.find(' ', start)) != std::string::npos) {
+    while ((end = strCommand.find(' ', start)) != string::npos)
+    {
         token = strCommand.substr(start, end - start);
         CommandToken.push_back(token);
         start = end + 1;
@@ -26,7 +29,8 @@ void Parser::TokenArgument(const std::string& strCommand) {
     CommandToken.push_back(token);
 }
 
-CmdStatus* Parser::UpdateCmdStatus() {
+CmdStatus* Parser::UpdateCmdStatus()
+{
     LOG_PRINT("Generate the appropriate command : W/R/E/F");
     if (CommandToken[0] == WRITE_CMD) return UpdateWriteCmdStatus();
     else if (CommandToken[0] == READ_CMD) return UpdateReadCmdStatus();
@@ -35,7 +39,8 @@ CmdStatus* Parser::UpdateCmdStatus() {
     return nullptr;
 }
 
-CmdStatus *Parser::UpdateWriteCmdStatus() {
+CmdStatus *Parser::UpdateWriteCmdStatus()
+{
     CheckWriteCommandToken();
     CmdStatus* result = new CmdStatus();
     result->Command = CmdType::Write;
@@ -44,7 +49,8 @@ CmdStatus *Parser::UpdateWriteCmdStatus() {
     return result;
 }
 
-CmdStatus* Parser::UpdateReadCmdStatus() {
+CmdStatus* Parser::UpdateReadCmdStatus()
+{
     CheckReadCommandToken();
     CmdStatus* result = new CmdStatus();
     result->Command = CmdType::Read;
@@ -52,7 +58,8 @@ CmdStatus* Parser::UpdateReadCmdStatus() {
     return result;
 }
 
-CmdStatus *Parser::UpdateEraseCmdStatus() {
+CmdStatus *Parser::UpdateEraseCmdStatus()
+{
     CheckEraseCommandToken();
     CmdStatus *result = new CmdStatus();
     result->Command = CmdType::Erase;
@@ -61,33 +68,42 @@ CmdStatus *Parser::UpdateEraseCmdStatus() {
     return result;
 }
 
-CmdStatus *Parser::UpdateFlushCmdStatus() {
+CmdStatus *Parser::UpdateFlushCmdStatus()
+{
     CheckFlushCommandToken();
     CmdStatus *result = new CmdStatus();
     result->Command = CmdType::Flush;
     return result;
 }
 
-void Parser::CheckWriteCommandToken() {
-    if (CommandToken.size() != 3) {
+void Parser::CheckWriteCommandToken()
+{
+    if (CommandToken.size() != 3)
+    {
         throw ArgsLengthNotMatchException();
     }
 }
 
-void Parser::CheckReadCommandToken() {
-    if (CommandToken.size() != 2) {
+void Parser::CheckReadCommandToken()
+{
+    if (CommandToken.size() != 2)
+    {
         throw ArgsLengthNotMatchException();
     }
 }
 
-void Parser::CheckEraseCommandToken() {
-    if (CommandToken.size() != 3) {
+void Parser::CheckEraseCommandToken()
+{
+    if (CommandToken.size() != 3)
+    {
         throw ArgsLengthNotMatchException();
     }
 }
 
-void Parser::CheckFlushCommandToken() {
-    if (CommandToken.size() != 1) {
+void Parser::CheckFlushCommandToken()
+{
+    if (CommandToken.size() != 1)
+    {
         throw ArgsLengthNotMatchException();
     }
 }

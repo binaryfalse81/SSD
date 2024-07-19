@@ -1,10 +1,11 @@
-// Copyright [2024] <CRA/BestReviewer>
+// Copyright.2024.binaryfalse81@gmail.com
 #pragma once
 #include <string>
 using namespace std;
 
-class SsdDriver {
- public:
+class SSDDriver
+{
+public:
     virtual string Read(int LBA) = 0;
     virtual void Write(int LBA, string Data) = 0;
     virtual void Erase(int startLBA, int Size) = 0;

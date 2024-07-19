@@ -1,29 +1,33 @@
-// Copyright [2024] <CRA/BestReviewer>
+// Copyright.2024.binaryfalse81@gmail.com
 #pragma once
 #include<vector>
 #include<string>
 
-enum class CmdType {
+using namespace std;
+
+enum class CmdType
+{
     Read,
     Write,
     Erase,
     Flush,
 };
 
-struct CmdStatus {
- public:
+typedef struct
+{
     CmdType Command;
-    std::string LBA;
-    std::string LBAData;
+    string LBA;
+    string LBAData;
     int EraseSize;
-};
+} CmdStatus;
 
-class Parser {
- public:
-    CmdStatus* Parse(const std::string& strCommand);
+class Parser
+{
+public:
+    CmdStatus* Parse(const string& strCommand);
 
- private:
-    void TokenArgument(const std::string& strCommand);
+private:
+    void TokenArgument(const string& strCommand);
     CmdStatus* UpdateCmdStatus();
     CmdStatus* UpdateWriteCmdStatus();
     CmdStatus* UpdateReadCmdStatus();
@@ -34,9 +38,9 @@ class Parser {
     void CheckEraseCommandToken();
     void CheckFlushCommandToken();
 
-    std::vector<std::string> CommandToken;
-    const std::string WRITE_CMD = "W";
-    const std::string READ_CMD = "R";
-    const std::string ERASE_CMD = "E";
-    const std::string FLUSH_CMD = "F";
+    vector<string> CommandToken;
+    const string WRITE_CMD = "W";
+    const string READ_CMD = "R";
+    const string ERASE_CMD = "E";
+    const string FLUSH_CMD = "F";
 };
