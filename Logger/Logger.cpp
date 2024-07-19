@@ -15,7 +15,7 @@ class Logger {
     }
     void print(const char* funcName, const char* logMessage) {
         const unsigned int KB = 1000;
-        const unsigned int MAX_LOG_FILE_SIZE = 10 * KB;
+        const unsigned int MAX_LOG_FILE_SIZE = KB * KB;
 
         time_t timer = time(NULL);
         tm nowTime;

@@ -19,23 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RealSsdDriver.cpp" />
-    <ClCompile Include="ShellCommand.cpp" />
-    <ClCompile Include="ShellCommandFactory.cpp" />
-    <ClCompile Include="Shell.cpp" />
-    <ClCompile Include="ShellMain.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="RealSsdDriver.h" />
-    <ClInclude Include="ShellCommand.h" />
-    <ClInclude Include="ShellCommandFactory.h" />
-    <ClInclude Include="SsdDriver.h" />
-    <ClInclude Include="Shell.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Logger\Logger.vcxproj">
       <Project>{02fc160d-b5fc-47cd-9d3b-9e15c559d690}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\SSD\SSD.vcxproj">
+      <Project>{257d1023-3d32-47e1-b6d4-5318e53a9b5e}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="RealSSDDriver.cpp" />
+    <ClCompile Include="Shell.cpp" />
+    <ClCompile Include="ShellCommand.cpp" />
+    <ClCompile Include="ShellCommandFactory.cpp" />
+    <ClCompile Include="ShellMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="RealSSDDriver.h" />
+    <ClInclude Include="Shell.h" />
+    <ClInclude Include="ShellCommand.h" />
+    <ClInclude Include="ShellCommandFactory.h" />
+    <ClInclude Include="SSDDriver.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

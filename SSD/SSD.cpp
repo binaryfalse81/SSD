@@ -43,8 +43,8 @@ void SSD::Flush() {
 
 CmdContent SSD::ParseCmd(const std::string& line) {
     CmdContent LBAData;
-    int firstSpacePosition = line.find(' ');
-    int secondSpacePosition = line.find(' ', firstSpacePosition + 1);
+    int firstSpacePosition = (int)line.find(' ');
+    int secondSpacePosition = (int)line.find(' ', firstSpacePosition + 1);
     LBAData.LBA = stoi(line.substr(0, firstSpacePosition));
     if (secondSpacePosition == std::string::npos) {
         LBAData.LBASize = 1;
@@ -59,7 +59,7 @@ CmdContent SSD::ParseCmd(const std::string& line) {
 
 std::vector<std::string> SSD::FindLBAData(const int& LBA) {
     std::vector<std::string> lines = ReadFile(CommandBufferFileName);
-    for (int line_index = lines.size() - 1; line_index >= 0; line_index--) {
+    for (int line_index = (int)lines.size() - 1; line_index >= 0; line_index--) {
         std::string line = lines[line_index];
         CmdContent bufferData = ParseCmd(line);
         if (IsInLBA(LBA, bufferData))
@@ -79,7 +79,7 @@ void SSD::StoreCommand(const int& LBA, const std::string& data, const int& size)
     std::vector<std::string> lines = ReadFile(CommandBufferFileName);
     lines.push_back(std::to_string(LBA) + " " + data + " " + std::to_string(size));
     WriteFile(CommandBufferFileName, lines);
-    CheckFlush(lines.size());
+    CheckFlush((int)lines.size());
 }
 
 void SSD::CheckFlush(const int& bufferSize) {

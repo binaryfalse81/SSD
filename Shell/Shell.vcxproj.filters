@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="RealSsdDriver.cpp" />
+    <ClCompile Include="RealSSDDriver.cpp" />
     <ClCompile Include="Shell.cpp" />
     <ClCompile Include="ShellCommand.cpp" />
     <ClCompile Include="ShellCommandFactory.cpp" />
     <ClCompile Include="ShellMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RealSsdDriver.h" />
+    <ClInclude Include="RealSSDDriver.h" />
     <ClInclude Include="Shell.h" />
     <ClInclude Include="ShellCommand.h" />
     <ClInclude Include="ShellCommandFactory.h" />
-    <ClInclude Include="SsdDriver.h" />
+    <ClInclude Include="SSDDriver.h" />
   </ItemGroup>
 </Project>

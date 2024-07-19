@@ -1,10 +1,9 @@
-// Copyright [2024] <CRA/BestReviewer>
+﻿// Copyright [2024] <CRA/BestReviewer>
 #include "RealSsdDriver.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include "../Logger/logger.cpp"
-#include <windows.h>
 
 using namespace std;
 
@@ -124,7 +123,11 @@ unsigned int RealSsdDriver::Compare() {
     return (unsigned int)cmpBufMgr.CompareBuf();
 }
 
-void RealSsdDriver::SystemCall(std::string cmdLine) {
+#if 0
+#include <windows.h>
+
+void RealSsdDriver::SystemCall(std::string cmdLine)
+{
     LOG_PRINT("Execute SSD.exe with a command");
 
     std::wstring ssd_exe_path;
@@ -147,16 +150,17 @@ void RealSsdDriver::SystemCall(std::string cmdLine) {
 
     // CreateProcessW로 외부 프로그램 실행
     if (!CreateProcessW(NULL, // 실행할 프로그램의 경로. NULL이면 ssd_exe_path에서 전체 경로를 지정해야 함
-        const_cast<LPWSTR>(ssd_exe_path.c_str()), // 실행할 프로그램 명령어 (const wchar_t* 타입으로 변환)
-        NULL, // 보안 속성
-        NULL, // 보안 속성
-        FALSE, // 핸들 상속 여부
-        0, // 생성 플래그
-        NULL, // 새로운 프로세스의 환경 변수
-        NULL, // 현재 디렉토리
-        &si, // STARTUPINFOW 구조체
-        &pi // PROCESS_INFORMATION 구조체
-    )) {
+                        const_cast<LPWSTR>(ssd_exe_path.c_str()), // 실행할 프로그램 명령어 (const wchar_t* 타입으로 변환)
+                        NULL, // 보안 속성
+                        NULL, // 보안 속성
+                        FALSE, // 핸들 상속 여부
+                        0, // 생성 플래그
+                        NULL, // 새로운 프로세스의 환경 변수
+                        NULL, // 현재 디렉토리
+                        &si, // STARTUPINFOW 구조체
+                        &pi // PROCESS_INFORMATION 구조체
+    ))
+    {
         std::cerr << "Failed to execute SSD.exe. Error code: " << GetLastError() << '\n';
         return;
     }
@@ -168,3 +172,60 @@ void RealSsdDriver::SystemCall(std::string cmdLine) {
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 }
+#endif
+
+#if 0
+void RealSsdDriver::SystemCall(string cmdLine)
+{
+    LOG_PRINT("Execute SSD.exe with a command");
+#ifdef _DEBUG
+    string ssd_exe_path = "..\\x64\\Debug\\SSD.exe";
+#else
+    string ssd_exe_path = "SSD.exe";
+#endif
+    ssd_exe_path += " ";
+    ssd_exe_path += cmdLine;
+    int result = system(ssd_exe_path.c_str());
+    if (result)
+    {
+        cerr << "Failed to execute SSD.exe. Error code: " << result << '\n';
+    }
+}
+#endif
+
+#if 1
+#include <windows.h>
+
+typedef int(*ExecuteCommandFunc)(const wchar_t*);
+
+void RealSsdDriver::SystemCall(string cmdLine) {
+    LOG_PRINT("Execute SSD.dll with a command");
+
+    // DLL 핸들을 로드
+    HMODULE hModule = LoadLibrary(L"SSD.dll");
+    if (hModule == NULL) {
+        cerr << "Failed to load SSD.dll. Error code: " << GetLastError() << '\n';
+        return;
+    }
+
+    // ExecuteCommand 함수의 주소를 가져옴
+    ExecuteCommandFunc ExecuteCommand = (ExecuteCommandFunc)GetProcAddress(hModule, "ExecuteCommand");
+    if (ExecuteCommand == NULL) {
+        cerr << "Failed to find ExecuteCommand function. Error code: " << GetLastError() << '\n';
+        FreeLibrary(hModule);
+        return;
+    }
+
+    // 명령어를 wide string으로 변환
+    wstring wideCmdLine = std::wstring(cmdLine.begin(), cmdLine.end());
+
+    // ExecuteCommand 함수 호출
+    int result = ExecuteCommand(wideCmdLine.c_str());
+    if (result != 0) {
+        cerr << "Failed to execute command in SSD.dll. Error code: " << result << '\n';
+    }
+
+    // DLL 언로드
+    FreeLibrary(hModule);
+}
+#endif

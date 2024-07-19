@@ -35,7 +35,7 @@ class SSDFixture : public testing::Test {
                 }
             }
             getline(file, line);
-            int LBADataFIrstIndex = line.find(" ");
+            int LBADataFIrstIndex = (int)line.find(" ");
             file.close();
             return line.substr(LBADataFIrstIndex + 1);
         }

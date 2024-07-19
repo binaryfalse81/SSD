@@ -1,4 +1,4 @@
-// Copyright [2024] <CRA/BestReviewer>
+﻿// Copyright [2024] <CRA/BestReviewer>
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include <iostream>
