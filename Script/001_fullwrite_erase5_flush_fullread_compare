@@ -1,0 +1,9 @@
+fullwrite 0xAAAAAAAA
+erase 0 1
+erase 10 1
+erase 20 1
+erase 30 1
+erase 40 1
+flush
+fullread
+compare

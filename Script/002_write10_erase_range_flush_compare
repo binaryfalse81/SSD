@@ -1,0 +1,13 @@
+write 90 0xAAAAAAAA
+write 91 0xAAAAAAAA
+write 92 0xAAAAAAAA
+write 93 0xAAAAAAAA
+write 94 0xAAAAAAAA
+write 95 0xAAAAAAAA
+write 96 0xAAAAAAAA
+write 97 0xAAAAAAAA
+write 98 0xAAAAAAAA
+write 99 0xAAAAAAAA
+erase_range 90 100
+flush
+compare

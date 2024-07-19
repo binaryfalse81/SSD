@@ -1,0 +1,4 @@
+001_fullwrite_erase5_flush_fullread_compare
+002_write10_erase_range_flush_compare
+003_help_write10_fail_read10
+004_loop_write_read_loop_erase_read_compare
