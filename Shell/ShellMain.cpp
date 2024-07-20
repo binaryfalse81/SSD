@@ -1,24 +1,18 @@
 // Copyright.2024.binaryfalse81@gmail.com
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
+#include "Header.h"
 #include "Shell.h"
 #include "RealSSDDriver.h"
 #include "../Logger/Logger.cpp"
-#include <chrono>
 
-using namespace std;
+const INT32 COMMAND_MODE = 1;
+const INT32 SCRIPT_MODE = 2;
 
-const int COMMAND_MODE = 1;
-const int SCRIPT_MODE = 2;
+VOID CommandMode(VOID);
+VOID ScriptMode(CHAR* argv[]);
+VOID RunScript(ifstream& runListFile);
+VOID FormatSSD(VOID);
 
-void CommandMode(void);
-void ScriptMode(char* argv[]);
-void RunScript(ifstream& runListFile);
-void FormatSSD(void);
-
-int main(int argc, char* argv[])
+INT32 main(INT32 argc, CHAR* argv[])
 {
     if (argc == COMMAND_MODE)
     {
@@ -54,14 +48,14 @@ bool deleteFileIfExists(const string& file_path)
     }
 }
 
-void FormatSSD(void)
+VOID FormatSSD(VOID)
 {
     deleteFileIfExists("nand.txt");
     deleteFileIfExists("result.txt");
     deleteFileIfExists("buffer.txt");
 }
 
-void CommandMode(void)
+VOID CommandMode(VOID)
 {
     FormatSSD();
     LOG_PRINT("Execute the input command being supported");
@@ -95,7 +89,7 @@ void CommandMode(void)
     }
 }
 
-void ScriptMode(char* argv[])
+VOID ScriptMode(CHAR* argv[])
 {
     string inputArg = argv[1];
     string strRunListFile{ inputArg };
@@ -112,7 +106,7 @@ void ScriptMode(char* argv[])
     }
 }
 
-void RunScript(ifstream& runListFile)
+VOID RunScript(ifstream& runListFile)
 {
     string strScriptFile;
 

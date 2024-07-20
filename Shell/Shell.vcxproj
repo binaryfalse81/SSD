@@ -27,6 +27,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CompareBufferManager.cpp" />
     <ClCompile Include="RealSSDDriver.cpp" />
     <ClCompile Include="Shell.cpp" />
     <ClCompile Include="ShellCommand.cpp" />
@@ -34,6 +35,7 @@
     <ClCompile Include="ShellMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CompareBufferManager.h" />
     <ClInclude Include="RealSSDDriver.h" />
     <ClInclude Include="Shell.h" />
     <ClInclude Include="ShellCommand.h" />
@@ -130,6 +132,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +147,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

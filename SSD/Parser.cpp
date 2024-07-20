@@ -1,5 +1,5 @@
 // Copyright.2024.binaryfalse81@gmail.com
-#include<stdexcept>
+#include "Header.h"
 #include"Parser.h"
 #include "../Logger/Logger.cpp"
 
@@ -11,7 +11,7 @@ CmdStatus *Parser::Parse(const string &strCommand)
     return UpdateCmdStatus();
 }
 
-void Parser::TokenArgument(const string& strCommand)
+VOID Parser::TokenArgument(const string& strCommand)
 {
     LOG_PRINT("Separate commands into tokens");
     string token;
@@ -76,7 +76,7 @@ CmdStatus *Parser::UpdateFlushCmdStatus()
     return result;
 }
 
-void Parser::CheckWriteCommandToken()
+VOID Parser::CheckWriteCommandToken()
 {
     if (CommandToken.size() != 3)
     {
@@ -84,7 +84,7 @@ void Parser::CheckWriteCommandToken()
     }
 }
 
-void Parser::CheckReadCommandToken()
+VOID Parser::CheckReadCommandToken()
 {
     if (CommandToken.size() != 2)
     {
@@ -92,7 +92,7 @@ void Parser::CheckReadCommandToken()
     }
 }
 
-void Parser::CheckEraseCommandToken()
+VOID Parser::CheckEraseCommandToken()
 {
     if (CommandToken.size() != 3)
     {
@@ -100,7 +100,7 @@ void Parser::CheckEraseCommandToken()
     }
 }
 
-void Parser::CheckFlushCommandToken()
+VOID Parser::CheckFlushCommandToken()
 {
     if (CommandToken.size() != 1)
     {

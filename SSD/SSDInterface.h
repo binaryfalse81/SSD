@@ -1,14 +1,12 @@
 // Copyright.2024.binaryfalse81@gmail.com
 #pragma once
-#include<string>
-
-using namespace std;
+#include "Header.h"
 
 class SSDInterface
 {
 public:
-    virtual void Write(const int &LBA, const string &data) = 0;
-    virtual void Read(const int &LBA) = 0;
-    virtual void Erase(const int &LBA, const int &size) = 0;
-    virtual void Flush() = 0;
+    virtual VOID Write(const INT32 &LBA, const string &data) = 0;
+    virtual VOID Read(const INT32 &LBA) = 0;
+    virtual VOID Erase(const INT32 &LBA, const INT32 &size) = 0;
+    virtual VOID Flush() = 0;
 };

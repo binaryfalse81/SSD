@@ -1,21 +1,18 @@
 // Copyright.2024.binaryfalse81@gmail.com
-#include <string>
-#include <iostream>
+#include "Header.h"
 #include "SSDCommand.h"
 
-using namespace std;
-
-string GetConcatenateArgv(int argc, char* argv[])
+string GetConcatenateArgv(INT32 argc, CHAR* argv[])
 {
     string result{ "" };
-    for (int i = 1; i < argc; i++)
+    for (INT32 i = 1; i < argc; i++)
     {
         result = result + " " + string(argv[i]);
     }
     return result;
 }
 
-int main(int argc, char* argv[])
+INT32 main(INT32 argc, CHAR* argv[])
 {
     Parser parser;
     SSD ssd;
@@ -44,7 +41,7 @@ int main(int argc, char* argv[])
 
 string WideCharToString(const wchar_t* wstr)
 {
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
+    INT32 size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
     if (size_needed <= 0)
     {
         cerr << "Error calculating buffer size: " << GetLastError() << '\n';
@@ -52,7 +49,7 @@ string WideCharToString(const wchar_t* wstr)
     }
 
     string strTo(size_needed - 1, 0);  // 널 문자 공간 제외
-    int result = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &strTo[0], size_needed, NULL, NULL);
+    INT32 result = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &strTo[0], size_needed, NULL, NULL);
     if (result == 0)
     {
         cerr << "Error converting wide string: " << GetLastError() << '\n';
@@ -62,7 +59,7 @@ string WideCharToString(const wchar_t* wstr)
     return strTo;
 }
 
-extern "C" __declspec(dllexport) int ExecuteCommand(const wchar_t* cmdLine)
+extern "C" __declspec(dllexport) INT32 ExecuteCommand(const wchar_t* cmdLine)
 {
     Parser parser;
     SSD ssd;
@@ -83,6 +80,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     case DLL_PROCESS_DETACH:
         break;
     }
-    return TRUE;
+    return true;
 }
 #endif

@@ -1,5 +1,6 @@
 //  Copyright [2024] <CRA/BestReviewer>
 #pragma once
+#include "Header.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "../SSD/SSD.cpp"
@@ -11,10 +12,10 @@ using namespace testing;
 class MockSSD : public SSDInterface
 {
 public:
-    MOCK_METHOD(void, Write, (const int& LBA, const string& data), (override));
-    MOCK_METHOD(void, Read, (const int& LBA), (override));
-    MOCK_METHOD(void, Erase, (const int& LBA, const int& size), (override));
-    MOCK_METHOD(void, Flush, (), (override));
+    MOCK_METHOD(VOID, Write, (const INT32& LBA, const string& data), (override));
+    MOCK_METHOD(VOID, Read, (const INT32& LBA), (override));
+    MOCK_METHOD(VOID, Erase, (const INT32& LBA, const INT32& size), (override));
+    MOCK_METHOD(VOID, Flush, (), (override));
 };
 
 class SSDFixture : public testing::Test
@@ -26,14 +27,14 @@ public:
     SSDCommand testCmd{ &mockSSD, &parser, &cmd };
 
     SSD ssd;
-    string getLSBData(int LBA)
+    string getLSBData(INT32 LBA)
     {
         string line;
         ifstream file("nand.txt");
 
         if (file.is_open())
         {
-            for (int i = 0; i < LBA; i++)
+            for (INT32 i = 0; i < LBA; i++)
             {
                 if (!getline(file, line))
                 {
@@ -41,7 +42,7 @@ public:
                 }
             }
             getline(file, line);
-            int LBADataFIrstIndex = (int)line.find(" ");
+            INT32 LBADataFIrstIndex = (INT32)line.find(" ");
             file.close();
             return line.substr(LBADataFIrstIndex + 1);
         }

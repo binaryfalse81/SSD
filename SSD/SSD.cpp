@@ -1,12 +1,5 @@
 // Copyright.2024.binaryfalse81@gmail.com
-#include<stdexcept>
-#include<fstream>
-#include<iostream>
-#include <sstream>
-#include <string>
-#include <map>
-#include <unordered_map>
-#include <vector>
+#include "Header.h"
 #include"SSD.h"
 #include "../Logger/Logger.cpp"
 
@@ -16,26 +9,26 @@ class DataPreFIxException : public exception {};
 class DataTypeException : public exception {};
 class EraseSizeException : public exception {};
 
-void SSD::Write(const int& LBA, const string& data)
+VOID SSD::Write(const INT32& LBA, const string& data)
 {
     CheckWriteCondition(LBA, data);
     StoreCommand(LBA, data, InitialUpdateSize);
 }
 
-void SSD::Read(const int& LBA)
+VOID SSD::Read(const INT32& LBA)
 {
     CheckLBARange(LBA);
     vector<string> readLine = FindLBAData(LBA);
     WriteFile(ReadFileName, readLine);
 }
 
-void SSD::Erase(const int& LBA, const int& size)
+VOID SSD::Erase(const INT32& LBA, const INT32& size)
 {
     CheckEraseCondition(LBA, size);
     StoreCommand(LBA, InitialLBAData, size);
 }
 
-void SSD::Flush()
+VOID SSD::Flush()
 {
     ReadMemory();
     vector<string> lines = ReadFile(CommandBufferFileName);
@@ -48,8 +41,8 @@ void SSD::Flush()
 CmdContent SSD::ParseCmd(const string& line)
 {
     CmdContent LBAData;
-    int firstSpacePosition = (int)line.find(' ');
-    int secondSpacePosition = (int)line.find(' ', firstSpacePosition + 1);
+    INT32 firstSpacePosition = (INT32)line.find(' ');
+    INT32 secondSpacePosition = (INT32)line.find(' ', firstSpacePosition + 1);
     LBAData.LBA = stoi(line.substr(0, firstSpacePosition));
     if (secondSpacePosition == string::npos)
     {
@@ -64,10 +57,10 @@ CmdContent SSD::ParseCmd(const string& line)
     return LBAData;
 }
 
-vector<string> SSD::FindLBAData(const int& LBA)
+vector<string> SSD::FindLBAData(const INT32& LBA)
 {
     vector<string> lines = ReadFile(CommandBufferFileName);
-    for (int line_index = (int)lines.size() - 1; line_index >= 0; line_index--)
+    for (INT32 line_index = (INT32)lines.size() - 1; line_index >= 0; line_index--)
     {
         string line = lines[line_index];
         CmdContent bufferData = ParseCmd(line);
@@ -79,21 +72,21 @@ vector<string> SSD::FindLBAData(const int& LBA)
     return { memory[LBA] };
 }
 
-bool SSD::IsInLBA(const int& LBA, CmdContent& bufferData)
+bool SSD::IsInLBA(const INT32& LBA, CmdContent& bufferData)
 {
     return LBA >= bufferData.LBA && LBA < (bufferData.LBA + bufferData.LBASize);
 }
 
-void SSD::StoreCommand(const int& LBA, const string& data, const int& size)
+VOID SSD::StoreCommand(const INT32& LBA, const string& data, const INT32& size)
 {
     LOG_PRINT("store new cmd into 'Command Buffer'");
     vector<string> lines = ReadFile(CommandBufferFileName);
     lines.push_back(to_string(LBA) + " " + data + " " + to_string(size));
     WriteFile(CommandBufferFileName, lines);
-    CheckFlush((int)lines.size());
+    CheckFlush((INT32)lines.size());
 }
 
-void SSD::CheckFlush(const int& bufferSize)
+VOID SSD::CheckFlush(const INT32& bufferSize)
 {
     if (bufferSize == Buffer_MAX_LINE)
     {
@@ -101,7 +94,7 @@ void SSD::CheckFlush(const int& bufferSize)
     }
 }
 
-void SSD::ReadMemory()
+VOID SSD::ReadMemory()
 {
     vector<string> lines = ReadFile(WriteFIleName);
     for (const auto &line : lines)
@@ -112,31 +105,31 @@ void SSD::ReadMemory()
 
     if (lines.empty())
     {
-        for (int i = 0; i <= MAX_LBA; i++)
+        for (INT32 i = 0; i <= MAX_LBA; i++)
         {
             memory[i] = InitialLBAData;
         }
     }
 }
 
-void SSD::UpdateMemory(const int& LBA, const string& data, const int& size)
+VOID SSD::UpdateMemory(const INT32& LBA, const string& data, const INT32& size)
 {
-    int endLBA = LBA + size;
+    INT32 endLBA = LBA + size;
     endLBA = endLBA > MAX_LBA ? MAX_LBA + 1 : endLBA;
-    for (int iLBA = LBA; iLBA < endLBA; iLBA++)
+    for (INT32 iLBA = LBA; iLBA < endLBA; iLBA++)
     {
         memory[iLBA] = data;
     }
 }
 
-void SSD::CheckValidCommand(const vector<string> &lines)
+VOID SSD::CheckValidCommand(const vector<string> &lines)
 {
     memset(isUsedBuffer, 0, sizeof(isUsedBuffer));
     validDataMap.clear();
     for (auto line_it = lines.rbegin(); line_it != lines.rend(); line_it++)
     {
         CmdContent bufferData = ParseCmd(*line_it);
-        for (int LBA_i = bufferData.LBA;  LBA_i < bufferData.LBA + bufferData.LBASize; LBA_i++)
+        for (INT32 LBA_i = bufferData.LBA;  LBA_i < bufferData.LBA + bufferData.LBASize; LBA_i++)
         {
             if (!isUsedBuffer[LBA_i])
             {
@@ -147,9 +140,9 @@ void SSD::CheckValidCommand(const vector<string> &lines)
     }
 }
 
-void SSD::RunValidCommand()
+VOID SSD::RunValidCommand()
 {
-    for (int LBA_i = MIN_LBA; LBA_i < MAX_LBA + 1; LBA_i++)
+    for (INT32 LBA_i = MIN_LBA; LBA_i < MAX_LBA + 1; LBA_i++)
     {
         if (isUsedBuffer[LBA_i])
         {
@@ -158,12 +151,12 @@ void SSD::RunValidCommand()
     }
 }
 
-void SSD::StoreMemory()
+VOID SSD::StoreMemory()
 {
     ofstream file(WriteFIleName);
     if (file.is_open())
     {
-        for (int LBA = 0; LBA <= MAX_LBA; LBA++)
+        for (INT32 LBA = 0; LBA <= MAX_LBA; LBA++)
         {
             file << LBA << " " << memory[LBA] << "\n";
         }
@@ -189,7 +182,7 @@ vector<string> SSD::ReadFile(const string& FileName)
     return lines;
 }
 
-void SSD::WriteFile(const string& FileName, vector<string>& lines)
+VOID SSD::WriteFile(const string& FileName, vector<string>& lines)
 {
     ofstream file(FileName);
     if (file.is_open())
@@ -202,7 +195,7 @@ void SSD::WriteFile(const string& FileName, vector<string>& lines)
     }
 }
 
-void SSD::CheckWriteCondition(const int& LBA, const string& data)
+VOID SSD::CheckWriteCondition(const INT32& LBA, const string& data)
 {
     CheckLBARange(LBA);
     CheckDataLength(data);
@@ -210,47 +203,47 @@ void SSD::CheckWriteCondition(const int& LBA, const string& data)
     CheckDataType(data);
 }
 
-void SSD::CheckEraseCondition(const int& LBA, const int& size)
+VOID SSD::CheckEraseCondition(const INT32& LBA, const INT32& size)
 {
     CheckLBARange(LBA);
     CheckEraseSizeRange(size);
     CheckLBARange(LBA + size - 1);
 }
 
-void SSD::CheckLBARange(const int& LBA)
+VOID SSD::CheckLBARange(const INT32& LBA)
 {
     if (LBA < 0 || LBA > MAX_LBA)
         throw LBARangeException();
 }
 
-void SSD::CheckDataLength(const string& data)
+VOID SSD::CheckDataLength(const string& data)
 {
     if (data.length() != DATA_LENGTH)
         throw DataRangeException();
 }
 
-void SSD::CheckDataPreFix(const string& data)
+VOID SSD::CheckDataPreFix(const string& data)
 {
     if (data.substr(0, 2) != DataPreFix)
         throw DataPreFIxException();
 }
 
-void SSD::CheckDataType(const string& data)
+VOID SSD::CheckDataType(const string& data)
 {
-    for (int i = 2; i < data.length(); i++)
+    for (INT32 i = 2; i < data.length(); i++)
     {
         if (isHexData(data[i]))continue;
         throw DataTypeException();
     }
 }
 
-void SSD::CheckEraseSizeRange(const int& size)
+VOID SSD::CheckEraseSizeRange(const INT32& size)
 {
     if (size > 10 || size < 0)
         throw EraseSizeException();
 }
 
-bool SSD::isHexData(const char& data)
+bool SSD::isHexData(const CHAR& data)
 {
     return (0 <= data - '0' && data - '0' < 10)
         || ('A' <= data && data <= 'F');

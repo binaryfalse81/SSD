@@ -1,9 +1,9 @@
 // Copyright.2024.binaryfalse81@gmail.com
-#include <string>
+#include "Header.h"
 #include "Shell.h"
 #include "SSDDriver.h"
 
-void Shell::Run(const string& strCommand)
+VOID Shell::Run(const string& strCommand)
 {
     shellCommand = shellCommandFactory.Make(strCommand);
 
@@ -27,7 +27,7 @@ void Shell::Run(const string& strCommand)
     delete(shellCommand);
 }
 
-void Shell::SetSsdDriver(SSDDriver* sd)
+VOID Shell::SetSsdDriver(SSDDriver* sd)
 {
     this->ssdDriver = sd;
     shellCommandFactory.SetSsdDriver(sd);

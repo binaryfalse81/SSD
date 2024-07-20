@@ -1,9 +1,6 @@
 // Copyright.2024.binaryfalse81@gmail.com
 #pragma once
-#include<vector>
-#include<string>
-
-using namespace std;
+#include "Header.h"
 
 enum class CmdType
 {
@@ -18,7 +15,7 @@ typedef struct
     CmdType Command;
     string LBA;
     string LBAData;
-    int EraseSize;
+    INT32 EraseSize;
 } CmdStatus;
 
 class Parser
@@ -27,16 +24,16 @@ public:
     CmdStatus* Parse(const string& strCommand);
 
 private:
-    void TokenArgument(const string& strCommand);
+    VOID TokenArgument(const string& strCommand);
     CmdStatus* UpdateCmdStatus();
     CmdStatus* UpdateWriteCmdStatus();
     CmdStatus* UpdateReadCmdStatus();
     CmdStatus* UpdateEraseCmdStatus();
     CmdStatus* UpdateFlushCmdStatus();
-    void CheckWriteCommandToken();
-    void CheckReadCommandToken();
-    void CheckEraseCommandToken();
-    void CheckFlushCommandToken();
+    VOID CheckWriteCommandToken();
+    VOID CheckReadCommandToken();
+    VOID CheckEraseCommandToken();
+    VOID CheckFlushCommandToken();
 
     vector<string> CommandToken;
     const string WRITE_CMD = "W";

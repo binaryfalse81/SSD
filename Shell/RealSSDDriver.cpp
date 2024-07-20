@@ -1,87 +1,17 @@
 ﻿// Copyright.2024.binaryfalse81@gmail.com
+#include "Header.h"
 #include "RealSSDDriver.h"
-#include <iostream>
-#include <fstream>
-#include <string>
 #include "../Logger/Logger.cpp"
-
-using namespace std;
-
-void CompareBufferMgr::SetCompareData(int LBA, string Data)
-{
-    if (0 <= LBA && LBA < CONFIG_MAX_LBA)
-    {
-        compareData[LBA] = Data;
-    }
-}
-
-bool CompareBufferMgr::CompareBuf()
-{
-    string ReadFileName{ "nand.txt" };
-    ifstream resultFile(ReadFileName);
-    string line;
-    int LBA = 0;
-
-    if (resultFile.is_open())
-    {
-        while (getline(resultFile, line))
-        {
-            LBA_INFO LbaInfo = Parse(line);
-            if (LbaInfo.LBAData != compareData[LBA])
-            {
-                return false;
-            }
-
-            LBA++;
-            if (LBA >= CONFIG_MAX_LBA)
-            {
-                break;
-            }
-        }
-        resultFile.close();
-    }
-    else
-    {
-        for (LBA = 0; LBA < CONFIG_MAX_LBA; LBA++)
-        {
-            if (compareData[LBA] != ERASE_DATA)
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-LBA_INFO CompareBufferMgr::Parse(const string& line)
-{
-    LBA_INFO LbaInfo;
-    int firstSpacePos = (int)line.find(' ');
-    int secondSpacePos = (int)line.find(' ', firstSpacePos + 1);
-    LbaInfo.LBA = stoi(line.substr(0, firstSpacePos));
-    if (secondSpacePos == string::npos)
-    {
-        LbaInfo.LBASize = 1;
-        LbaInfo.LBAData = line.substr(firstSpacePos + 1);
-    }
-    else
-    {
-        LbaInfo.LBAData = line.substr(firstSpacePos + 1, secondSpacePos - (firstSpacePos + 1));
-        LbaInfo.LBASize = stoi(line.substr(secondSpacePos + 1));
-    }
-    return LbaInfo;
-}
 
 RealSSDDriver::RealSSDDriver()
 {
-    for (int i = 0; i < CONFIG_MAX_LBA; i++)
+    for (INT32 i = 0; i < CONFIG_MAX_LBA; i++)
     {
         cmpBufMgr.SetCompareData(i, "0x00000000");
     }
 }
 
-string RealSSDDriver::Read(int LBA)
+string RealSSDDriver::Read(INT32 LBA)
 {
     LOG_PRINT("Read from LBA");
     string cmdLine = "R " + to_string(LBA);
@@ -103,7 +33,7 @@ string RealSSDDriver::Read(int LBA)
     return line;
 }
 
-void RealSSDDriver::Write(int LBA, string Data)
+VOID RealSSDDriver::Write(INT32 LBA, string Data)
 {
     LOG_PRINT("Write a data to LBA");
     string cmdLine = "W " + to_string(LBA) + " " + Data;
@@ -111,16 +41,16 @@ void RealSSDDriver::Write(int LBA, string Data)
     SystemCall(cmdLine);
 }
 
-void RealSSDDriver::Erase(int startLBA, int Size)
+VOID RealSSDDriver::Erase(INT32 startLBA, INT32 Size)
 {
     LOG_PRINT("Erase data in specific area");
-    int LBA = startLBA;
+    INT32 LBA = startLBA;
     while (Size > 0)
     {
-        int EraseUnitSize = ((ERASE_LBA_UNIT < Size) ? (ERASE_LBA_UNIT) : (Size));
+        INT32 EraseUnitSize = ((ERASE_LBA_UNIT < Size) ? (ERASE_LBA_UNIT) : (Size));
         string cmdLine = "E " + to_string(LBA);
         cmdLine += " " + to_string(EraseUnitSize);
-        for (int i = LBA; i < LBA + EraseUnitSize; i++)
+        for (INT32 i = LBA; i < LBA + EraseUnitSize; i++)
         {
             cmpBufMgr.SetCompareData(i, "0x00000000");
         }
@@ -130,15 +60,15 @@ void RealSSDDriver::Erase(int startLBA, int Size)
     }
 }
 
-void RealSSDDriver::Flush()
+VOID RealSSDDriver::Flush()
 {
     LOG_PRINT("Execute commands in 'Command Buffer'");
     SystemCall("F");
 }
 
-unsigned int RealSSDDriver::Compare()
+UINT32 RealSSDDriver::Compare()
 {
-    return (unsigned int)cmpBufMgr.CompareBuf();
+    return (UINT32)cmpBufMgr.CompareBuf();
 }
 
 #define SYSTEM_CALL_VER_1   (false)
@@ -146,7 +76,7 @@ unsigned int RealSSDDriver::Compare()
 #define USING_DLL           (true)
 
 #if (SYSTEM_CALL_VER_1)
-void RealSsdDriver::SystemCall(string cmdLine)
+VOID RealSsdDriver::SystemCall(string cmdLine)
 {
     LOG_PRINT("Execute SSD.exe with a command");
 #ifdef _DEBUG
@@ -156,7 +86,7 @@ void RealSsdDriver::SystemCall(string cmdLine)
 #endif
     ssd_exe_path += " ";
     ssd_exe_path += cmdLine;
-    int result = system(ssd_exe_path.c_str());
+    INT32 result = system(ssd_exe_path.c_str());
     if (result)
     {
         cerr << "Failed to execute SSD.exe. Error code: " << result << '\n';
@@ -165,7 +95,7 @@ void RealSsdDriver::SystemCall(string cmdLine)
 #elif (SYSTEM_CALL_VER_2)
 #include <windows.h>
 
-void RealSsdDriver::SystemCall(string cmdLine)
+VOID RealSsdDriver::SystemCall(string cmdLine)
 {
     LOG_PRINT("Execute SSD.exe with a command");
 
@@ -192,7 +122,7 @@ void RealSsdDriver::SystemCall(string cmdLine)
         const_cast<LPWSTR>(ssd_exe_path.c_str()), // 실행할 프로그램 명령어 (const wchar_t* 타입으로 변환)
         NULL, // 보안 속성
         NULL, // 보안 속성
-        FALSE, // 핸들 상속 여부
+        false, // 핸들 상속 여부
         0, // 생성 플래그
         NULL, // 새로운 프로세스의 환경 변수
         NULL, // 현재 디렉토리
@@ -214,9 +144,9 @@ void RealSsdDriver::SystemCall(string cmdLine)
 #elif (USING_DLL)
 #include <windows.h>
 
-typedef int(*ExecuteCommandFunc)(const wchar_t*);
+typedef INT32(*ExecuteCommandFunc)(const wchar_t*);
 
-void RealSSDDriver::SystemCall(string cmdLine)
+VOID RealSSDDriver::SystemCall(string cmdLine)
 {
     LOG_PRINT("Execute SSD.dll with a command");
 
@@ -246,7 +176,7 @@ void RealSSDDriver::SystemCall(string cmdLine)
     wstring wideCmdLine = wstring(cmdLine.begin(), cmdLine.end());
 
     // ExecuteCommand 함수 호출
-    int result = ExecuteCommand(wideCmdLine.c_str());
+    INT32 result = ExecuteCommand(wideCmdLine.c_str());
     if (result != 0)
     {
         cerr << "Failed to execute command in SSD.dll. Error code: " << result << '\n';

@@ -1,8 +1,7 @@
 ﻿// Copyright.2024.binaryfalse81@gmail.com
+#include "Header.h"
 #include "ShellCommandFactory.h"
 #include "../Logger/Logger.cpp"
-
-using namespace std;
 
 ShellCommand* ShellCommandFactory::Make(const string& strCommand)
 {
@@ -11,12 +10,12 @@ ShellCommand* ShellCommandFactory::Make(const string& strCommand)
     return result;
 }
 
-void ShellCommandFactory::SetSsdDriver(SSDDriver* sd)
+VOID ShellCommandFactory::SetSsdDriver(SSDDriver* sd)
 {
     this->sd = sd;
 }
 
-void ShellCommandFactory::TokenArgument(const string& strCommand)
+VOID ShellCommandFactory::TokenArgument(const string& strCommand)
 {
     LOG_PRINT("Separate commands into tokens");
     string token;
@@ -35,7 +34,7 @@ void ShellCommandFactory::TokenArgument(const string& strCommand)
     CommandToken.push_back(token);
 }
 
-void ShellCommandFactory::MakeCommand()
+VOID ShellCommandFactory::MakeCommand()
 {
     LOG_PRINT("Generate the appropriate command");
     if (CommandToken.empty() == true) result = MakeInvalidCommand();
@@ -262,7 +261,7 @@ ShellCommand* ShellCommandFactory::MakeCompareCommand()
 
 bool ShellCommandFactory::IsStringDecimal(const string& str)
 {
-    for (char ch = 0; ch < str.size(); ch++)
+    for (CHAR ch = 0; ch < str.size(); ch++)
     {
         if ('0' > str[ch] || str[ch] > '9')
         {
@@ -281,7 +280,7 @@ bool ShellCommandFactory::IsStringHexadecimal(const string& str)
         return false;
     }
 
-    for (int idx = 2; idx < str.size(); idx++)
+    for (INT32 idx = 2; idx < str.size(); idx++)
     {
         if (('0' > str[idx] || str[idx] > '9') &&
             ('A' > str[idx] || str[idx] > 'F'))
@@ -294,7 +293,7 @@ bool ShellCommandFactory::IsStringHexadecimal(const string& str)
 
 bool ShellCommandFactory::IsStringValidLBA(const string& str)
 {
-    int LBA = stoi(str);
+    INT32 LBA = stoi(str);
     if ((sd->GetMinLBA() <= LBA) && (LBA <= sd->GetMaxLBA()))
     {
         return true;
@@ -315,7 +314,7 @@ bool ShellCommandFactory::IsStringValidLength(const string& strStartLBA, const s
 
 string ShellCommandFactory::LimitToMinLBA(const string& str)
 {
-    int LBA = stoi(str);
+    INT32 LBA = stoi(str);
     if (LBA < sd->GetMinLBA())
     {
         LBA = sd->GetMinLBA();
@@ -326,7 +325,7 @@ string ShellCommandFactory::LimitToMinLBA(const string& str)
 
 string ShellCommandFactory::LimitToMaxLBA(const string& str)
 {
-    int LBA = stoi(str);
+    INT32 LBA = stoi(str);
     if (LBA > sd->GetMaxLBA() + 1)
     {
         LBA = sd->GetMaxLBA() + 1;

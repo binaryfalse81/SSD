@@ -1,13 +1,10 @@
 // Copyright.2024.binaryfalse81@gmail.com
-#include <iostream>
-#include <string>
+#include "Header.h"
 #include "ShellCommand.h"
 #include "SSDDriver.h"
 #include "../Logger/Logger.cpp"
 
-using namespace std;
-
-void InvalidCommand::Run(SSDDriver* sd)
+VOID InvalidCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("");
     cout << "INVALID COMMAND" << endl;
@@ -20,7 +17,7 @@ WriteCommand::WriteCommand(string strLBA, string strData)
     this->strData = strData;
 }
 
-void WriteCommand::Run(SSDDriver* sd)
+VOID WriteCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute write command");
     sd->Write(this->nLBA, this->strData);
@@ -32,7 +29,7 @@ ReadCommand::ReadCommand(string strLBA)
     this->nLBA = stoi(strLBA);
 }
 
-void ReadCommand::Run(SSDDriver* sd)
+VOID ReadCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute read command");
     string resultData = sd->Read(this->nLBA);
@@ -48,7 +45,7 @@ EraseCommand::EraseCommand(string strStartLBA, string strSize)
     this->nSize = stoi(strSize);
 }
 
-void EraseCommand::Run(SSDDriver* sd)
+VOID EraseCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute erase command");
     sd->Erase(this->nStartLBA, this->nSize);
@@ -62,33 +59,33 @@ EraseRangeCommand::EraseRangeCommand(string strStartLBA, string strEndLBA)
     this->nEndLBA = stoi(strEndLBA);
 }
 
-void EraseRangeCommand::Run(SSDDriver* sd)
+VOID EraseRangeCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute erase range command");
     sd->Erase(this->nStartLBA, this->nEndLBA - this->nStartLBA);
 }
 
-void FlushCommand::Run(SSDDriver* sd)
+VOID FlushCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute flush command");
     sd->Flush();
 }
 
-void ExitCommand::Run(SSDDriver* sd)
+VOID ExitCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("");
     cout << "[Exit] Quit Shell" << endl;
     throw ExitTestShell();
 }
 
-void FailCommand::Run(SSDDriver* sd)
+VOID FailCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("");
     cout << "[Fail] Fault Injection" << endl;
     throw FailTestShell();
 }
 
-void HelpCommand::Run(SSDDriver* sd)
+VOID HelpCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("print supported commands");
     string HelpMessage = "";
@@ -113,20 +110,20 @@ FullWriteCommand::FullWriteCommand(string strData)
     this->strData = strData;
 }
 
-void FullWriteCommand::Run(SSDDriver* sd)
+VOID FullWriteCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute full write command");
-    for (int LBA = sd->GetMinLBA(); LBA <= sd->GetMaxLBA(); LBA++)
+    for (INT32 LBA = sd->GetMinLBA(); LBA <= sd->GetMaxLBA(); LBA++)
     {
         sd->Write(LBA, this->strData);
     }
 }
 
-void FullReadCommand::Run(SSDDriver* sd)
+VOID FullReadCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute full read command");
     cout << "[FullRead]\n";
-    for (int LBA = sd->GetMinLBA(); LBA <= sd->GetMaxLBA(); LBA++)
+    for (INT32 LBA = sd->GetMinLBA(); LBA <= sd->GetMaxLBA(); LBA++)
     {
         string resultData = sd->Read(LBA);
         cout << "[Read] LBA : " << to_string(LBA);
@@ -134,7 +131,7 @@ void FullReadCommand::Run(SSDDriver* sd)
     }
 }
 
-void Compare::Run(SSDDriver* sd)
+VOID Compare::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute compare command");
     cout << "[Compare]\n";

@@ -1,4 +1,6 @@
 // Copyright.2024.binaryfalse81@gmail.com
-int main()
+#include "Header.h"
+
+INT32 main()
 {
 }

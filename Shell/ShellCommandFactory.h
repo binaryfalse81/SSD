@@ -1,7 +1,6 @@
 // Copyright.2024.binaryfalse81@gmail.com
 #pragma once
-#include <vector>
-#include <string>
+#include "Header.h"
 #include "ShellCommand.h"
 #include "SSDDriver.h"
 
@@ -9,14 +8,14 @@ class ShellCommandFactory
 {
 public:
     ShellCommand* Make(const string& strCommand);
-    void SetSsdDriver(SSDDriver* sd);
+    VOID SetSsdDriver(SSDDriver* sd);
 
 protected:
     SSDDriver* sd;
 
 private:
-    void TokenArgument(const string& strCommand);
-    void MakeCommand();
+    VOID TokenArgument(const string& strCommand);
+    VOID MakeCommand();
     ShellCommand* MakeInvalidCommand();
     ShellCommand* MakeWriteCommand();
     ShellCommand* MakeReadCommand();
@@ -43,5 +42,5 @@ private:
     vector<string> CommandToken;
     ShellCommand* result;
 
-    const int MAX_STR_LENGTH_DATA = 10;
+    const INT32 MAX_STR_LENGTH_DATA = 10;
 };

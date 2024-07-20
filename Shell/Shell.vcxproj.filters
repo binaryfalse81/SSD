@@ -6,6 +6,7 @@
     <ClCompile Include="ShellCommand.cpp" />
     <ClCompile Include="ShellCommandFactory.cpp" />
     <ClCompile Include="ShellMain.cpp" />
+    <ClCompile Include="CompareBufferManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealSSDDriver.h" />
@@ -13,5 +14,6 @@
     <ClInclude Include="ShellCommand.h" />
     <ClInclude Include="ShellCommandFactory.h" />
     <ClInclude Include="SSDDriver.h" />
+    <ClInclude Include="CompareBufferManager.h" />
   </ItemGroup>
 </Project>

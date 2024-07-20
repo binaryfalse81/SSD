@@ -13,6 +13,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shell", "Shell\Shell.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shell_Test", "Shell_Test\Shell_Test.vcxproj", "{4674614E-B4EB-469C-ADD1-E43F3869A753}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "솔루션 항목", "솔루션 항목", "{CFD6E27C-106F-4E62-92E7-8E0222A7AD22}"
+	ProjectSection(SolutionItems) = preProject
+		Header.h = Header.h
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

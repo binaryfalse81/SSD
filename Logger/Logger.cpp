@@ -1,13 +1,8 @@
 // Copyright.2024.binaryfalse81@gmail.com
 #pragma once
-#include <iostream>
-#include <ctime>
-#include <string>
-#include <fstream>
+#include "Header.h"
 
-using namespace std;
-
-#define LOG_PRINT(text)  Logger::getInstance().print(__FUNCTION__, text)
+#define LOG_PRINT(text)  Logger::getInstance().Print(__FUNCTION__, text)
 
 class Logger
 {
@@ -18,17 +13,17 @@ public:
         return instance;
     }
 
-    void print(const char* funcName, const char* logMessage)
+    VOID Print(const CHAR* funcName, const CHAR* logMessage)
     {
-        const unsigned int KB = 1000;
-        const unsigned int MAX_LOG_FILE_SIZE = KB * KB;
+        const UINT32 KB = 1000;
+        const UINT32 MAX_LOG_FILE_SIZE = KB * KB;
 
         time_t timer = time(NULL);
         tm nowTime;
         localtime_s(&nowTime, &timer);
 
-        const unsigned int BUFFER_SIZE = 200;
-        char logCommit[BUFFER_SIZE];
+        const UINT32 BUFFER_SIZE = 200;
+        CHAR logCommit[BUFFER_SIZE];
         sprintf_s(logCommit,
                   BUFFER_SIZE,
                   "[%02d.%02d.%02d %02d:%02d:%02d] %-5s : %s\n",
@@ -62,8 +57,8 @@ public:
     }
 
 private:
-    const char* _LOG_FILE;
-    const char* _OLD_FILE;
+    const CHAR* _LOG_FILE;
+    const CHAR* _OLD_FILE;
     Logger()
     {
         _LOG_FILE = "latest.log";
@@ -77,7 +72,7 @@ private:
         logfile.close();
     }
 
-    int GetLogFileSize(const char* fileName)
+    INT32 GetLogFileSize(const CHAR* fileName)
     {
         ifstream readFile(fileName);
         if (!readFile.is_open())
@@ -85,12 +80,12 @@ private:
             throw runtime_error("[Error] failed to open readFile");
         }
         readFile.seekg(0, ios::end);
-        int readFileSize = (int)readFile.tellg();
+        INT32 readFileSize = (INT32)readFile.tellg();
 
         return readFileSize;
     }
 
-    void WriteToLogFile(const char* fileName,
+    VOID WriteToLogFile(const CHAR* fileName,
                         ios_base::openmode mode,
                         const string& logContents)
     {
@@ -102,17 +97,17 @@ private:
         writeFile << logContents;
     }
 
-    void CompressOldestFile()
+    VOID CompressOldestFile()
     {
         string oldfile;
         if (IsExistPreviousOldFile(oldfile))
         {
             string newFileName = oldfile.substr(0, oldfile.find(".")) + string(".zip");
-            int ret = rename(oldfile.c_str(), newFileName.c_str());
+            INT32 ret = rename(oldfile.c_str(), newFileName.c_str());
         }
     }
 
-    int IsExistPreviousOldFile(string& oldFileName)
+    INT32 IsExistPreviousOldFile(string& oldFileName)
     {
         ifstream readFile(_OLD_FILE);
         if (!readFile.is_open())
@@ -124,16 +119,16 @@ private:
         getline(readFile, stateAndName);
         if (stateAndName.empty()) return 0;
 
-        int isOldFileExist = stoi(stateAndName.substr(0, stateAndName.find(" ")));
+        INT32 isOldFileExist = stoi(stateAndName.substr(0, stateAndName.find(" ")));
         oldFileName = stateAndName.substr(stateAndName.find(" ")+1);
 
         return isOldFileExist;
     }
 
-    void ChangeNameWithTimeStamp(const tm& nowTime)
+    VOID ChangeNameWithTimeStamp(const tm& nowTime)
     {
-        const unsigned int BUFFER_SIZE = 50;
-        char over10KBLogFile[BUFFER_SIZE];
+        const UINT32 BUFFER_SIZE = 50;
+        CHAR over10KBLogFile[BUFFER_SIZE];
         sprintf_s(over10KBLogFile,
                   BUFFER_SIZE,
                   "util_%02d%02d%02d_%02dh_%02dm_%02ds.log",
@@ -143,7 +138,7 @@ private:
                   nowTime.tm_hour,
                   nowTime.tm_min,
                   nowTime.tm_sec);
-        int ret = rename(_LOG_FILE, over10KBLogFile);
+        INT32 ret = rename(_LOG_FILE, over10KBLogFile);
 
         WriteToLogFile(_OLD_FILE, ios::out, string("1 ") + string(over10KBLogFile));
     }

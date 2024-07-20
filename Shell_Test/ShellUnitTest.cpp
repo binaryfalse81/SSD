@@ -1,38 +1,34 @@
 ﻿// Copyright.2024.binaryfalse81@gmail.com
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include <iostream>
-#include <fstream> 
-#include <sstream>
-#include <iomanip>
+#include "Header.h"
 #include "../Shell/SsdDriver.h"
 #include "../Shell/RealSsdDriver.h"
 #include "../Shell/Shell.h"
 
-using namespace std;
 using namespace testing;
 
 class MockSSDDriver : public SSDDriver
 {
 public:
-    MOCK_METHOD(string, Read, (int LBA), (override));
-    MOCK_METHOD(void, Write, (int LBA, string Data), (override));
-    MOCK_METHOD(void, Erase, (int startLBA, int Size), (override));
-    MOCK_METHOD(void, Flush, (), (override));
-    MOCK_METHOD(unsigned int, Compare, (), (override));
-    int GetMinLBA() override { return 0; }
-    int GetMaxLBA() override { return 99; }
+    MOCK_METHOD(string, Read, (INT32 LBA), (override));
+    MOCK_METHOD(VOID, Write, (INT32 LBA, string Data), (override));
+    MOCK_METHOD(VOID, Erase, (INT32 startLBA, INT32 Size), (override));
+    MOCK_METHOD(VOID, Flush, (), (override));
+    MOCK_METHOD(UINT32, Compare, (), (override));
+    INT32 GetMinLBA() override { return 0; }
+    INT32 GetMaxLBA() override { return 99; }
 };
 
 class MockSSDTestShellFixture : public testing::Test
 {
 protected:
-    void SetUp() override
+    VOID SetUp() override
     {
         backup_cout = cout.rdbuf(actualOutput.rdbuf());
         shell.SetSsdDriver(&mockSSDDriver);
     }
-    void TearDown() override
+    VOID TearDown() override
     {
         cout.rdbuf(backup_cout);
     }
@@ -42,20 +38,20 @@ public:
     NiceMock<MockSSDDriver> mockSSDDriver;
     stringstream actualOutput;
     streambuf* backup_cout;
-    int startOneLBA = 3;
-    const int MAX_LBA_CNT = 100;
+    INT32 startOneLBA = 3;
+    const INT32 MAX_LBA_CNT = 100;
     const string UNMAPED_DATA       = "0x00000000";
     const string WRITE_DATA         = "0xAABBCCDD";
     const string INV_WRITE_DATA     = "0xAAGGCCDD";
     const string INVALID_COMMAND    = "INVALID COMMAND\n";
 
-    string MakeExpectedOutStr(int LBA, string Data)
+    string MakeExpectedOutStr(INT32 LBA, string Data)
     {
         string expectedOutStr;
         if (LBA == MAX_LBA_CNT)
         {
             expectedOutStr = "[FullRead]\n";
-            for (int i = 0; i < MAX_LBA_CNT; i++)
+            for (INT32 i = 0; i < MAX_LBA_CNT; i++)
             {
                 expectedOutStr += ("[Read] LBA : " + to_string(i));
                 expectedOutStr += (", Data : " + Data + "\n");
@@ -70,7 +66,7 @@ public:
         return expectedOutStr;
     }
 
-    void VerifyResult(string expectedOutStr)
+    VOID VerifyResult(string expectedOutStr)
     {
         EXPECT_THAT(actualOutput.str(), StrEq(expectedOutStr));
     }
@@ -195,12 +191,12 @@ TEST_F(MockSSDTestShellFixture, Erase_Partial)
     shell.Run("fullread");
 
     string expectBuffer = "[FullRead]\n";
-    for (int LBA = 0; LBA < 5; LBA++)
+    for (INT32 LBA = 0; LBA < 5; LBA++)
     {
         expectBuffer += MakeExpectedOutStr(LBA, UNMAPED_DATA);
     }
 
-    for (int LBA = 5; LBA < MAX_LBA_CNT; LBA++)
+    for (INT32 LBA = 5; LBA < MAX_LBA_CNT; LBA++)
     {
         expectBuffer += MakeExpectedOutStr(LBA, WRITE_DATA);
     }
@@ -394,7 +390,7 @@ TEST_F(MockSSDTestShellFixture, Flush)
     EXPECT_CALL(mockSSDDriver, Flush)
         .Times(1);
 
-    for (int i = 0; i < 7; i++)
+    for (INT32 i = 0; i < 7; i++)
     {
         shell.Run("write " + to_string(i) + " " + WRITE_DATA);
     }
@@ -409,57 +405,57 @@ class RealSsdTestShellFixture : public testing::Test
 public:
     Shell shell;
     RealSSDDriver realSSDDriver;
-    int startOneLBA = 3;
-    const int MAX_LBA_CNT = 100;
+    INT32 startOneLBA = 3;
+    const INT32 MAX_LBA_CNT = 100;
     const string UNMAPPED_DATA = "0x00000000";
     const string WRITE_DATA = "0xAABBCCDD";
     const string INV_WRITE_DATA = "0xAAGGCCDD";
     const string INVALID_COMMAND = "INVALID COMMAND\n";
     vector<string> strDataList;
 
-    void Compare()
+    VOID Compare()
     {
         shell.Run("compare");
     }
 
-    void FullWrite(string data)
+    VOID FullWrite(string data)
     {
-        for (int i = 0; i < MAX_LBA_CNT; i++)
+        for (INT32 i = 0; i < MAX_LBA_CNT; i++)
     {
             shell.Run("write " + to_string(i) + " " + data);
             strDataList[i] = data;
         }
     }
 
-    void Write(int LBA, int Length, string data)
+    VOID Write(INT32 LBA, INT32 Length, string data)
     {
-        for (int i = 0; i < Length; i++)
+        for (INT32 i = 0; i < Length; i++)
         {
             shell.Run("write " + to_string(LBA + i) + " " + data);
             strDataList[LBA + i] = data;
         }
     }
 
-    void Erase(int LBA, int Length)
+    VOID Erase(INT32 LBA, INT32 Length)
     {
         shell.Run("erase " + to_string(LBA) + " " + to_string(Length));
-        for (int i = 0; i < Length; i++)
+        for (INT32 i = 0; i < Length; i++)
         {
             if (LBA + i >= MAX_LBA_CNT) break;
             strDataList[LBA + i] = UNMAPPED_DATA;
         }
     }
-    void Flush()
+    VOID Flush()
     {
         shell.Run("flush");
     }
 
-    void PrintCurrentStep(int step, string stepname)
+    VOID PrintCurrentStep(INT32 step, string stepname)
     {
         cout << "\r [Step #" << step << "] " << stepname;
     }
 
-    string MakeRandomData(int randvalue)
+    string MakeRandomData(INT32 randvalue)
     {
         stringstream stream;
         stream << "0x" << setfill('0') << setw(8) << hex << uppercase << randvalue;
@@ -467,17 +463,17 @@ public:
     }
 
 protected:
-    void SetUp() override
+    VOID SetUp() override
     {
         shell.SetSsdDriver(&realSSDDriver);
         FormatSSD();
         strDataList.clear();
-        for (int i = 0; i < MAX_LBA_CNT; i++)
+        for (INT32 i = 0; i < MAX_LBA_CNT; i++)
         {
             strDataList.push_back("0x00000000");
         }
     }
-    void TearDown() override
+    VOID TearDown() override
     {
         cout << endl;
     }
@@ -505,7 +501,7 @@ private:
         }
     }
 
-    void FormatSSD(void)
+    VOID FormatSSD(VOID)
     {
         deleteFileIfExists("nand.txt");
         deleteFileIfExists("result.txt");
@@ -522,7 +518,7 @@ TEST_F(RealSsdTestShellFixture, FullWriteReadCompare)
 
 TEST_F(RealSsdTestShellFixture, FullRead10Compare)
 {
-    for (int i = 0; i < 10; i++)
+    for (INT32 i = 0; i < 10; i++)
     {
         shell.Run("fullread");
     }
@@ -531,7 +527,7 @@ TEST_F(RealSsdTestShellFixture, FullRead10Compare)
 
 TEST_F(RealSsdTestShellFixture, Loop_WriteAndReadCompare)
 {
-    for (int i = 0; i < 8; i++)
+    for (INT32 i = 0; i < 8; i++)
     {
         shell.Run("write 0 0x0000000A");
         shell.Run("read 0");
@@ -541,7 +537,7 @@ TEST_F(RealSsdTestShellFixture, Loop_WriteAndReadCompare)
 
 TEST_F(RealSsdTestShellFixture, Write10AndCompare)
 {
-    for (int i = 0; i < 10; i++)
+    for (INT32 i = 0; i < 10; i++)
     {
         shell.Run("write " + to_string(i) + " 0x0000000A");
     }
@@ -555,15 +551,15 @@ TEST_F(RealSsdTestShellFixture, LongTermTest)
     Compare();
 
     srand(0);
-    for (int i = 0; i < 1000; i++)
+    for (INT32 i = 0; i < 1000; i++)
     {
         try
         {
             if (true)
             {
                 PrintCurrentStep(i, "PartialWrite");
-                int LBA = (rand() % 100);
-                int Length = rand() % 13;
+                INT32 LBA = (rand() % 100);
+                INT32 Length = rand() % 13;
                 if (LBA + Length >= MAX_LBA_CNT) Length = MAX_LBA_CNT - LBA - 1;
                 Write(LBA, Length, MakeRandomData(rand()));
             }
@@ -571,8 +567,8 @@ TEST_F(RealSsdTestShellFixture, LongTermTest)
             if (i % 5 == 0)
             {
                 PrintCurrentStep(i, "PartialErase");
-                int LBA = (rand() % 100);
-                int Length = (rand() % 10) + 1;
+                INT32 LBA = (rand() % 100);
+                INT32 Length = (rand() % 10) + 1;
                 if (LBA + Length >= MAX_LBA_CNT) Length = MAX_LBA_CNT - LBA - 1;
                 Erase(LBA, Length);
             }
