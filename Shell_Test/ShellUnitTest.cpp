@@ -196,13 +196,15 @@ TEST_F(MockSSDTestShellFixture, Erase_Partial)
 
     string expectBuffer = "[FullRead]\n";
     for (int LBA = 0; LBA < 5; LBA++)
-{
+    {
         expectBuffer += MakeExpectedOutStr(LBA, UNMAPED_DATA);
     }
+
     for (int LBA = 5; LBA < MAX_LBA_CNT; LBA++)
-{
+    {
         expectBuffer += MakeExpectedOutStr(LBA, WRITE_DATA);
     }
+
     VerifyResult(expectBuffer);
 }
 
@@ -393,9 +395,10 @@ TEST_F(MockSSDTestShellFixture, Flush)
         .Times(1);
 
     for (int i = 0; i < 7; i++)
-{
+    {
         shell.Run("write " + to_string(i) + " " + WRITE_DATA);
     }
+
     shell.Run("flush");
 }
 
