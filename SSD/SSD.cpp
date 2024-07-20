@@ -21,7 +21,7 @@ VOID SSD::Read(const UINT32& nLpn)
 {
     CheckLpnRange(nLpn);
     vector<string> readLine = FindLpnData(nLpn);
-    WriteFile(ReadFileName, readLine);
+    WriteFile("result.txt", readLine);
 }
 
 VOID SSD::Erase(const UINT32& nLpn, const UINT32& nSize)
@@ -32,12 +32,12 @@ VOID SSD::Erase(const UINT32& nLpn, const UINT32& nSize)
 
 VOID SSD::Flush()
 {
-    ReadMemory();
-    vector<string> lines = ReadFile(CommandBufferFileName);
+    ReadNAND();
+    vector<string> lines = ReadFile(strBufferFileName);
     CheckValidCommand(lines);
     RunValidCommand();
-    remove(CommandBufferFileName.c_str());
-    StoreMemory();
+    remove(strBufferFileName.c_str());
+    StoreNAND();
 }
 
 NAND_DATA SSD::ParseCmd(const string& line)
@@ -61,7 +61,7 @@ NAND_DATA SSD::ParseCmd(const string& line)
 
 vector<string> SSD::FindLpnData(const UINT32& nLpn)
 {
-    vector<string> lines = ReadFile(CommandBufferFileName);
+    vector<string> lines = ReadFile(strBufferFileName);
     for (INT32 i = (INT32)lines.size() - 1; i >= 0; i--)
     {
         string line = lines[i];
@@ -70,8 +70,8 @@ vector<string> SSD::FindLpnData(const UINT32& nLpn)
             return { stNandData.strPattern };
     }
 
-    ReadMemory();
-    return { memory[nLpn] };
+    ReadNAND();
+    return { checkMap[nLpn] };
 }
 
 bool SSD::IsInLpn(const UINT32& nLpn, NAND_DATA& stNandData)
@@ -82,9 +82,9 @@ bool SSD::IsInLpn(const UINT32& nLpn, NAND_DATA& stNandData)
 VOID SSD::StoreCommand(const UINT32& nLpn, const string& strPattern, const UINT32& nSize)
 {
     LOG_PRINT("store new cmd into 'Command Buffer'");
-    vector<string> lines = ReadFile(CommandBufferFileName);
+    vector<string> lines = ReadFile(strBufferFileName);
     lines.push_back(to_string(nLpn) + " " + strPattern + " " + to_string(nSize));
-    WriteFile(CommandBufferFileName, lines);
+    WriteFile(strBufferFileName, lines);
     CheckFlush((INT32)lines.size());
 }
 
@@ -96,31 +96,31 @@ VOID SSD::CheckFlush(const INT32& bufferSize)
     }
 }
 
-VOID SSD::ReadMemory()
+VOID SSD::ReadNAND()
 {
-    vector<string> lines = ReadFile(WriteFIleName);
+    vector<string> lines = ReadFile("nand.txt");
     for (const auto &line : lines)
     {
         NAND_DATA stNandData = ParseCmd(line);
-        UpdateMemory(stNandData.nLpn, stNandData.strPattern, stNandData.nSize);
+        UpdateNAND(stNandData.nLpn, stNandData.strPattern, stNandData.nSize);
     }
 
     if (lines.empty())
     {
         for (UINT32 i = 0; i < MAX_LPN; i++)
         {
-            memory[i] = UNMAPED_PATTERN;
+            checkMap[i] = UNMAPED_PATTERN;
         }
     }
 }
 
-VOID SSD::UpdateMemory(const UINT32& nLpn, const string& strPattern, const UINT32& nSize)
+VOID SSD::UpdateNAND(const UINT32& nLpn, const string& strPattern, const UINT32& nSize)
 {
-    UINT32 endLpn = nLpn + nSize;
-    endLpn = (endLpn >= MAX_LPN) ? MAX_LPN : endLpn;
-    for (UINT32 i = nLpn; i < endLpn; i++)
+    UINT32 nEndLpn = nLpn + nSize;
+    nEndLpn = (nEndLpn >= MAX_LPN) ? MAX_LPN : nEndLpn;
+    for (UINT32 i = nLpn; i < nEndLpn; i++)
     {
-        memory[i] = strPattern;
+        checkMap[i] = strPattern;
     }
 }
 
@@ -148,37 +148,38 @@ VOID SSD::RunValidCommand()
     {
         if (IsUsedBuffer[i])
         {
-            UpdateMemory(i, validDataMap[i], INITIAL_UPDATE_SIZE);
+            UpdateNAND(i, validDataMap[i], INITIAL_UPDATE_SIZE);
         }
     }
 }
 
-VOID SSD::StoreMemory()
+VOID SSD::StoreNAND()
 {
-    ofstream file(WriteFIleName);
-    if (file.is_open())
+    ofstream NandFileStream("nand.txt");
+    if (NandFileStream.is_open())
     {
         for (UINT32 nLpn = 0; nLpn < MAX_LPN; nLpn++)
         {
-            file << nLpn << " " << memory[nLpn] << "\n";
+            NandFileStream << nLpn << " " << checkMap[nLpn] << "\n";
         }
-        file.close();
+        NandFileStream.close();
     }
 }
 
 vector<string> SSD::ReadFile(const string& strFileName)
 {
     vector<string> astrLines;
-    ifstream file(strFileName);
+    ifstream FileStream(strFileName);
     string strCmd;
 
-    if (file.is_open())
+    if (FileStream.is_open())
     {
-        while (getline(file, strCmd))
+        while (getline(FileStream, strCmd))
         {
             astrLines.push_back(strCmd);
         }
-        file.close();
+
+        FileStream.close();
     }
 
     return astrLines;
@@ -186,14 +187,15 @@ vector<string> SSD::ReadFile(const string& strFileName)
 
 VOID SSD::WriteFile(const string& strFileName, vector<string>& lines)
 {
-    ofstream file(strFileName);
-    if (file.is_open())
+    ofstream FileStream(strFileName);
+    if (FileStream.is_open())
     {
         for (const auto& line : lines)
         {
-            file << line << "\n";
+            FileStream << line << "\n";
         }
-        file.close();
+
+        FileStream.close();
     }
 }
 

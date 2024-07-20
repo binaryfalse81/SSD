@@ -2,7 +2,7 @@
 #pragma once
 #include "Header.h"
 #include "SSDDriver.h"
-#include "CompareBufferManager.h"
+#include "VerifyMgr.h"
 
 class RealSSDDriver : public SSDDriver
 {
@@ -16,5 +16,5 @@ public:
 
 private:
     VOID SystemCall(string strCmd);
-    CompareBufferMgr cmpBufMgr;
+    VerifyMgr cmpBufMgr;
 };

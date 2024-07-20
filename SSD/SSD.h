@@ -12,12 +12,10 @@ public:
     virtual VOID Flush() override;
 
 private:
-    map<UINT32, string> memory;
+    map<UINT32, string> checkMap;
     unordered_map<UINT32, string> validDataMap;
     UINT32 IsUsedBuffer[MAX_LPN];
-    string WriteFIleName{ "nand.txt" };
-    string ReadFileName{ "result.txt" };
-    string CommandBufferFileName{ "buffer.txt" };
+    string strBufferFileName{ "buffer.txt" };
     string DataPreFix{ "0x" };
 
     NAND_DATA ParseCmd(const string &line);
@@ -25,15 +23,15 @@ private:
     bool IsInLpn(const UINT32 &nLpn, NAND_DATA& bufferData);
     VOID StoreCommand(const UINT32& nLpn, const string& strPattern, const UINT32& nSize);
     VOID CheckFlush(const INT32& bufferSize);
-    VOID ReadMemory();
-    VOID UpdateMemory(const UINT32& nLpn, const string& strPattern, const UINT32& nSize);
+    VOID ReadNAND();
+    VOID UpdateNAND(const UINT32& nLpn, const string& strPattern, const UINT32& nSize);
     VOID UpdateMemoryWithBuffer(const vector<string> &lines);
     VOID UpdateMemoryWithCmd(const vector<string> &lines);
     VOID CheckValidCommand(const vector<string> &lines);
     VOID RunValidCommand();
-    VOID StoreMemory();
-    vector<string> ReadFile(const string& FileName);
-    VOID WriteFile(const string& FileName, vector<string>& lines);
+    VOID StoreNAND();
+    vector<string> ReadFile(const string& strFileName);
+    VOID WriteFile(const string& strFileName, vector<string>& lines);
     VOID CheckWriteCondition(const UINT32& nLpn, const string& strPattern);
     VOID CheckEraseCondition(const UINT32& nLpn, const UINT32& nSize);
     VOID CheckLpnRange(const UINT32& nLpn);

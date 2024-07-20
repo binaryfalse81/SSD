@@ -27,7 +27,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CompareBufferManager.cpp" />
+    <ClCompile Include="VerifyMgr.cpp" />
     <ClCompile Include="RealSSDDriver.cpp" />
     <ClCompile Include="Shell.cpp" />
     <ClCompile Include="ShellCommand.cpp" />
@@ -35,7 +35,7 @@
     <ClCompile Include="ShellMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CompareBufferManager.h" />
+    <ClInclude Include="VerifyMgr.h" />
     <ClInclude Include="RealSSDDriver.h" />
     <ClInclude Include="Shell.h" />
     <ClInclude Include="ShellCommand.h" />

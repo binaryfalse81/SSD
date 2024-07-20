@@ -31,20 +31,20 @@ public:
     string getLSBData(UINT32 nLpn)
     {
         string line;
-        ifstream file("nand.txt");
+        ifstream NandFileStream("nand.txt");
 
-        if (file.is_open())
+        if (NandFileStream.is_open())
         {
             for (UINT32 i = 0; i < nLpn; i++)
             {
-                if (!getline(file, line))
+                if (!getline(NandFileStream, line))
                 {
                     break;
                 }
             }
-            getline(file, line);
+            getline(NandFileStream, line);
             UINT32 LpnDataFIrstIndex = (UINT32)line.find(" ");
-            file.close();
+            NandFileStream.close();
             return line.substr(LpnDataFIrstIndex + 1);
         }
         return UNMAPED_PATTERN;
