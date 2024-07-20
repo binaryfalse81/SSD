@@ -5,11 +5,9 @@
 class SSDDriver
 {
 public:
-    virtual string Read(INT32 LBA) = 0;
-    virtual VOID Write(INT32 LBA, string Data) = 0;
-    virtual VOID Erase(INT32 startLBA, INT32 Size) = 0;
+    virtual string Read(UINT32 nLpn) = 0;
+    virtual VOID Write(UINT32 nLpn, string strPattern) = 0;
+    virtual VOID Erase(UINT32 nLpn, UINT32 nSize) = 0;
     virtual VOID Flush() = 0;
     virtual UINT32 Compare() = 0;
-    virtual INT32 GetMinLBA() = 0;
-    virtual INT32 GetMaxLBA() = 0;
 };

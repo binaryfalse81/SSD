@@ -12,16 +12,13 @@ public:
     virtual VOID Flush() override;
 
 private:
-    map<INT32, string> memory;
-    unordered_map<INT32, string> validDataMap;
-    INT32 isUsedBuffer[MAX_LPN];
+    map<UINT32, string> memory;
+    unordered_map<UINT32, string> validDataMap;
+    UINT32 IsUsedBuffer[MAX_LPN];
     string WriteFIleName{ "nand.txt" };
     string ReadFileName{ "result.txt" };
     string CommandBufferFileName{ "buffer.txt" };
     string DataPreFix{ "0x" };
-    const UINT32 InitialUpdateSize{1};
-    const UINT32 Buffer_MAX_LINE{10};
-    const UINT32 DATA_LENGTH{10};
 
     NAND_DATA ParseCmd(const string &line);
     vector<string> FindLpnData(const UINT32 &nLpn);
@@ -37,12 +34,12 @@ private:
     VOID StoreMemory();
     vector<string> ReadFile(const string& FileName);
     VOID WriteFile(const string& FileName, vector<string>& lines);
-    VOID CheckWriteCondition(const UINT32& nLpn, const string& data);
+    VOID CheckWriteCondition(const UINT32& nLpn, const string& strPattern);
     VOID CheckEraseCondition(const UINT32& nLpn, const UINT32& nSize);
     VOID CheckLpnRange(const UINT32& nLpn);
-    VOID CheckDataLength(const string& data);
-    VOID CheckDataPreFix(const string& data);
-    VOID CheckDataType(const string& data);
+    VOID CheckDataLength(const string& strPattern);
+    VOID CheckDataPreFix(const string& strPattern);
+    VOID CheckDataType(const string& strPattern);
     VOID CheckEraseSizeRange(const INT32& nSize);
-    bool isHexData(const CHAR& data);
+    bool IsHexData(const CHAR& ch);
 };

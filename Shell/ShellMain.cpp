@@ -4,8 +4,8 @@
 #include "RealSSDDriver.h"
 #include "../Logger/Logger.cpp"
 
-const INT32 COMMAND_MODE = 1;
-const INT32 SCRIPT_MODE = 2;
+const UINT32 COMMAND_MODE   = 1;
+const UINT32 SCRIPT_MODE    = 2;
 
 VOID CommandMode(VOID);
 VOID ScriptMode(CHAR* argv[]);
@@ -26,7 +26,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     return 0;
 }
 
-bool deleteFileIfExists(const string& file_path)
+bool deleteFileIfExists(string file_path)
 {
     ifstream file(file_path);
 

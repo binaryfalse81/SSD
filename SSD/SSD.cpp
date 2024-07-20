@@ -14,7 +14,7 @@ class EraseSizeException : public exception {};
 VOID SSD::Write(const UINT32& nLpn, const string& strPattern)
 {
     CheckWriteCondition(nLpn, strPattern);
-    StoreCommand(nLpn, strPattern, InitialUpdateSize);
+    StoreCommand(nLpn, strPattern, INITIAL_UPDATE_SIZE);
 }
 
 VOID SSD::Read(const UINT32& nLpn)
@@ -90,7 +90,7 @@ VOID SSD::StoreCommand(const UINT32& nLpn, const string& strPattern, const INT32
 
 VOID SSD::CheckFlush(const INT32& bufferSize)
 {
-    if (bufferSize == Buffer_MAX_LINE)
+    if (bufferSize == MAX_CMD_BUF_CNT)
     {
         Flush();
     }
@@ -126,17 +126,17 @@ VOID SSD::UpdateMemory(const UINT32& nLpn, const string& strPattern, const INT32
 
 VOID SSD::CheckValidCommand(const vector<string> &lines)
 {
-    memset(isUsedBuffer, 0, sizeof(isUsedBuffer));
+    memset(IsUsedBuffer, 0, sizeof(IsUsedBuffer));
     validDataMap.clear();
     for (auto line_it = lines.rbegin(); line_it != lines.rend(); line_it++)
     {
         NAND_DATA stNandData = ParseCmd(*line_it);
         for (UINT32 i = stNandData.nLpn;  i < stNandData.nLpn + stNandData.nSize; i++)
         {
-            if (!isUsedBuffer[i])
+            if (!IsUsedBuffer[i])
             {
                 validDataMap[i] = stNandData.strPattern;
-                isUsedBuffer[i] = 1;
+                IsUsedBuffer[i] = 1;
             }
         }
     }
@@ -146,9 +146,9 @@ VOID SSD::RunValidCommand()
 {
     for (UINT32 i = 0; i < MAX_LPN; i++)
     {
-        if (isUsedBuffer[i])
+        if (IsUsedBuffer[i])
         {
-            UpdateMemory(i, validDataMap[i], InitialUpdateSize);
+            UpdateMemory(i, validDataMap[i], INITIAL_UPDATE_SIZE);
         }
     }
 }
@@ -220,7 +220,7 @@ VOID SSD::CheckLpnRange(const UINT32& nLpn)
 
 VOID SSD::CheckDataLength(const string& strPattern)
 {
-    if (strPattern.length() != DATA_LENGTH)
+    if (strPattern.length() != MAX_PATTERN_LENGTH)
         throw DataRangeException();
 }
 
@@ -234,7 +234,7 @@ VOID SSD::CheckDataType(const string& strPattern)
 {
     for (UINT32 i = 2; i < strPattern.length(); i++)
     {
-        if (isHexData(strPattern[i])) continue;
+        if (IsHexData(strPattern[i])) continue;
         throw DataTypeException();
     }
 }
@@ -245,7 +245,7 @@ VOID SSD::CheckEraseSizeRange(const INT32& nSize)
         throw EraseSizeException();
 }
 
-bool SSD::isHexData(const CHAR& ch)
+bool SSD::IsHexData(const CHAR& ch)
 {
     return (0 <= ch - '0' && ch - '0' < 10) || ('A' <= ch && ch <= 'F');
 }

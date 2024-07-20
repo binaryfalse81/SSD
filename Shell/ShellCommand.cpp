@@ -10,59 +10,59 @@ VOID InvalidCommand::Run(SSDDriver* sd)
     cout << "INVALID COMMAND" << endl;
 }
 
-WriteCommand::WriteCommand(string strLBA, string strData)
+WriteCommand::WriteCommand(string strLpn, string strPattern)
 {
-    this->strLBA = strLBA;
-    this->nLBA = stoi(strLBA);
-    this->strData = strData;
+    this->strLpn = strLpn;
+    this->nLpn = stoi(strLpn);
+    this->strPattern = strPattern;
 }
 
 VOID WriteCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute write command");
-    sd->Write(this->nLBA, this->strData);
+    sd->Write(this->nLpn, this->strPattern);
 }
 
-ReadCommand::ReadCommand(string strLBA)
+ReadCommand::ReadCommand(string strLpn)
 {
-    this->strLBA = strLBA;
-    this->nLBA = stoi(strLBA);
+    this->strLpn = strLpn;
+    this->nLpn = stoi(strLpn);
 }
 
 VOID ReadCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute read command");
-    string resultData = sd->Read(this->nLBA);
-    cout << "[Read] LBA : " << this->strLBA;
+    string resultData = sd->Read(this->nLpn);
+    cout << "[Read] nLpn : " << this->strLpn;
     cout << ", Data : " << resultData << endl;
 }
 
-EraseCommand::EraseCommand(string strStartLBA, string strSize)
+EraseCommand::EraseCommand(string strLpn, string strSize)
 {
-    this->strStartLBA = strStartLBA;
+    this->strLpn = strLpn;
     this->strSize = strSize;
-    this->nStartLBA = stoi(strStartLBA);
+    this->nLpn = stoi(strLpn);
     this->nSize = stoi(strSize);
 }
 
 VOID EraseCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute erase command");
-    sd->Erase(this->nStartLBA, this->nSize);
+    sd->Erase(this->nLpn, this->nSize);
 }
 
-EraseRangeCommand::EraseRangeCommand(string strStartLBA, string strEndLBA)
+EraseRangeCommand::EraseRangeCommand(string strStartLpn, string strEndLpn)
 {
-    this->strStartLBA = strStartLBA;
-    this->strEndLBA = strEndLBA;
-    this->nStartLBA = stoi(strStartLBA);
-    this->nEndLBA = stoi(strEndLBA);
+    this->strStartLpn = strStartLpn;
+    this->strEndLpn = strEndLpn;
+    this->nLpnStart = stoi(strStartLpn);
+    this->nLpnEnd = stoi(strEndLpn);
 }
 
 VOID EraseRangeCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute erase range command");
-    sd->Erase(this->nStartLBA, this->nEndLBA - this->nStartLBA);
+    sd->Erase(this->nLpnStart, this->nLpnEnd - this->nLpnStart);
 }
 
 VOID FlushCommand::Run(SSDDriver* sd)
@@ -91,31 +91,31 @@ VOID HelpCommand::Run(SSDDriver* sd)
     string HelpMessage = "";
 
     HelpMessage += "[Help]\n";
-    HelpMessage += "1. write {LBA} {Data}\n";
-    HelpMessage += "2. read {LBA}\n";
+    HelpMessage += "1. write {nLpn} {Data}\n";
+    HelpMessage += "2. read {nLpn}\n";
     HelpMessage += "3. exit\n";
     HelpMessage += "4. help\n";
     HelpMessage += "5. fullwrite {Data}\n";
     HelpMessage += "6. fullread\n";
-    HelpMessage += "7. erase {LBA} {Size}\n";
-    HelpMessage += "8. erase_range {LBA} {LBA}\n";
+    HelpMessage += "7. erase {nLpn} {Size}\n";
+    HelpMessage += "8. erase_range {nLpn} {nLpn}\n";
     HelpMessage += "9. flush\n";
-    HelpMessage += "{LBA} = {x is an integer | 0 <= x <= 99}\n";
+    HelpMessage += "{nLpn} = {x is an integer | 0 <= x <= 99}\n";
     HelpMessage += "{Data} = {""0x[0-9A-F]""}\n";
     cout << HelpMessage;
 }
 
-FullWriteCommand::FullWriteCommand(string strData)
+FullWriteCommand::FullWriteCommand(string strPattern)
 {
-    this->strData = strData;
+    this->strPattern = strPattern;
 }
 
 VOID FullWriteCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute full write command");
-    for (INT32 LBA = sd->GetMinLBA(); LBA <= sd->GetMaxLBA(); LBA++)
+    for (UINT32 nLpn = 0; nLpn < MAX_LPN; nLpn++)
     {
-        sd->Write(LBA, this->strData);
+        sd->Write(nLpn, this->strPattern);
     }
 }
 
@@ -123,11 +123,11 @@ VOID FullReadCommand::Run(SSDDriver* sd)
 {
     LOG_PRINT("execute full read command");
     cout << "[FullRead]\n";
-    for (INT32 LBA = sd->GetMinLBA(); LBA <= sd->GetMaxLBA(); LBA++)
+    for (UINT32 nLpn = 0; nLpn < MAX_LPN; nLpn++)
     {
-        string resultData = sd->Read(LBA);
-        cout << "[Read] LBA : " << to_string(LBA);
-        cout << ", Data : " << resultData << endl;
+        string strResult = sd->Read(nLpn);
+        cout << "[Read] nLpn : " << to_string(nLpn);
+        cout << ", Data : " << strResult << endl;
     }
 }
 

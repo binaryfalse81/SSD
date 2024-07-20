@@ -3,13 +3,13 @@
 #include "Shell.h"
 #include "SSDDriver.h"
 
-VOID Shell::Run(const string& strCommand)
+VOID Shell::Run(string strCmd)
 {
-    shellCommand = shellCommandFactory.Make(strCommand);
+    sc = scf.Make(strCmd);
 
     try
     {
-        shellCommand->Run(ssdDriver);
+        sc->Run(sd);
     }
     catch (FailTestShell)
     {
@@ -24,11 +24,11 @@ VOID Shell::Run(const string& strCommand)
         throw ExceptionCompareFail();
     }
 
-    delete(shellCommand);
+    delete(sc);
 }
 
 VOID Shell::SetSsdDriver(SSDDriver* sd)
 {
-    this->ssdDriver = sd;
-    shellCommandFactory.SetSsdDriver(sd);
+    this->sd = sd;
+    scf.SetSsdDriver(sd);
 }

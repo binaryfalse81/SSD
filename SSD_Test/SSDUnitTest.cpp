@@ -9,32 +9,33 @@
 
 using namespace testing;
 
-class MockSSD : public SSDInterface
+class MockSSD : public Disk
 {
 public:
-    MOCK_METHOD(VOID, Write, (const INT32& LBA, const string& data), (override));
-    MOCK_METHOD(VOID, Read, (const INT32& LBA), (override));
-    MOCK_METHOD(VOID, Erase, (const INT32& LBA, const INT32& size), (override));
+    MOCK_METHOD(VOID, Write, (const UINT32& nLpn, const string& strPattern), (override));
+    MOCK_METHOD(VOID, Read, (const UINT32& nLpn), (override));
+    MOCK_METHOD(VOID, Erase, (const UINT32& nLpn, const UINT32& nSize), (override));
     MOCK_METHOD(VOID, Flush, (), (override));
 };
 
-class SSDFixture : public testing::Test
+class SSDTestFixture : public testing::Test
 {
 public:
     NiceMock<MockSSD> mockSSD;
     Parser parser;
-    CmdStatus cmd;
-    SSDCommand testCmd{ &mockSSD, &parser, &cmd };
+    CMD_INFO stCmdInfo;
+    SSDCommand testCmd{ &mockSSD, &parser, &stCmdInfo };
+    const string UNMAPED_PATTERN = "0x00000000";
 
     SSD ssd;
-    string getLSBData(INT32 LBA)
+    string getLSBData(UINT32 nLpn)
     {
         string line;
         ifstream file("nand.txt");
 
         if (file.is_open())
         {
-            for (INT32 i = 0; i < LBA; i++)
+            for (UINT32 i = 0; i < nLpn; i++)
             {
                 if (!getline(file, line))
                 {
@@ -42,100 +43,100 @@ public:
                 }
             }
             getline(file, line);
-            INT32 LBADataFIrstIndex = (INT32)line.find(" ");
+            UINT32 LpnDataFIrstIndex = (UINT32)line.find(" ");
             file.close();
-            return line.substr(LBADataFIrstIndex + 1);
+            return line.substr(LpnDataFIrstIndex + 1);
         }
-        return "0x00000000";
+        return UNMAPED_PATTERN;
     }
 };
 
-TEST_F(SSDFixture, TestLBARangeExceptionWhenWrite)
+TEST_F(SSDTestFixture, TestLpnRangeExceptionWhenWrite)
 {
-    EXPECT_THROW(ssd.Write(100, "0x10000000"), LBARangeException);
+    EXPECT_THROW(ssd.Write(MAX_LPN, "0x10000000"), LpnRangeException);
 }
 
-TEST_F(SSDFixture, TestDataRangeException)
+TEST_F(SSDTestFixture, TestDataRangeException)
 {
-    EXPECT_THROW(ssd.Write(99, "0x100000"), DataRangeException);
+    EXPECT_THROW(ssd.Write(MAX_LPN - 1, "0x100000"), DataRangeException);
 }
 
-TEST_F(SSDFixture, TestDataPreFIxException)
+TEST_F(SSDTestFixture, TestDataPreFIxException)
 {
-    EXPECT_THROW(ssd.Write(99, "0110000000"), DataPreFIxException);
+    EXPECT_THROW(ssd.Write(MAX_LPN - 1, "0110000000"), DataPreFIxException);
 }
 
-TEST_F(SSDFixture, TestDataTypeException)
+TEST_F(SSDTestFixture, TestDataTypeException)
 {
-    EXPECT_THROW(ssd.Write(99, "0x1000000Z"), DataTypeException);
+    EXPECT_THROW(ssd.Write(MAX_LPN - 1, "0x1000000Z"), DataTypeException);
 }
 
-TEST_F(SSDFixture, TestWriteMemory)
+TEST_F(SSDTestFixture, TestWriteMemory)
 {
     ssd.Write(0, "0x10000001");
     ssd.Flush();
     EXPECT_EQ("0x10000001", getLSBData(0));
 }
 
-TEST_F(SSDFixture, TestWriteCommandWithMock)
+TEST_F(SSDTestFixture, TestWriteCommandWithMock)
 {
     EXPECT_CALL(mockSSD, Write).Times(1);
     testCmd.Run("SSD.exe W 0 0x00000001");
 }
 
-TEST_F(SSDFixture, TestLBARangeExceptionWhenRead)
+TEST_F(SSDTestFixture, TestLpnRangeExceptionWhenRead)
 {
-    EXPECT_THROW(ssd.Read(-10), LBARangeException);
-    EXPECT_THROW(ssd.Read(100), LBARangeException);
+    EXPECT_THROW(ssd.Read(-10), LpnRangeException);
+    EXPECT_THROW(ssd.Read(MAX_LPN), LpnRangeException);
 }
 
-TEST_F(SSDFixture, TestReadCommandWithMock)
+TEST_F(SSDTestFixture, TestReadCommandWithMock)
 {
     EXPECT_CALL(mockSSD, Read).Times(1);
     testCmd.Run("SSD.exe R 0");
 }
 
-TEST_F(SSDFixture, TestLBARangeExceptionWhenErase)
+TEST_F(SSDTestFixture, TestLpnRangeExceptionWhenErase)
 {
-    EXPECT_THROW(ssd.Erase(-10, 10), LBARangeException);
-    EXPECT_THROW(ssd.Erase(100, 10), LBARangeException);
+    EXPECT_THROW(ssd.Erase(-10, 10), LpnRangeException);
+    EXPECT_THROW(ssd.Erase(MAX_LPN, 10), LpnRangeException);
 }
 
-TEST_F(SSDFixture, TestEraseSizeRangeException)
+TEST_F(SSDTestFixture, TestEraseSizeRangeException)
 {
     EXPECT_THROW(ssd.Erase(1, 11), EraseSizeException);
     EXPECT_THROW(ssd.Erase(1, -1), EraseSizeException);
 }
 
-TEST_F(SSDFixture, TestEraseMemory)
+TEST_F(SSDTestFixture, TestEraseMemory)
 {
     ssd.Erase(0, 1);
     ssd.Flush();
-    EXPECT_EQ("0x00000000", getLSBData(0));
+    EXPECT_EQ(UNMAPED_PATTERN, getLSBData(0));
 }
 
-TEST_F(SSDFixture, TestEraseMemoryOverMaxLBAException)
+TEST_F(SSDTestFixture, TestEraseMemoryOverMaxLpnException)
 {
-    EXPECT_THROW(ssd.Erase(98, 10), LBARangeException);
+    EXPECT_THROW(ssd.Erase(MAX_LPN - 2, 10), LpnRangeException);
 }
 
-TEST_F(SSDFixture, TestEraseMemoryWithMaxLBA)
+TEST_F(SSDTestFixture, TestEraseMemoryWithMaxLpn)
 {
-    ssd.Write(99, "0x00000099");
-    ssd.Erase(99, 1);
+    ssd.Write(MAX_LPN - 1, "0x00000099");
+    ssd.Erase(MAX_LPN - 1, 1);
     ssd.Flush();
-    EXPECT_EQ("0x00000000", getLSBData(99));
+    EXPECT_EQ(UNMAPED_PATTERN, getLSBData(MAX_LPN - 1));
 }
 
-TEST_F(SSDFixture, TestEraseMemoryWithMaxRange)
+TEST_F(SSDTestFixture, TestEraseMemoryWithMaxRange)
 {
-    ssd.Write(98, "0x00000098");
+    ssd.Write(MAX_LPN - 2, "0x00000098");
     ssd.Erase(90, 10);
     ssd.Flush();
-    EXPECT_EQ("0x00000000", getLSBData(98));
+    EXPECT_EQ(UNMAPED_PATTERN, getLSBData(MAX_LPN - 2));
 }
 
-TEST_F(SSDFixture, TestEraseCommandWithMock)
+TEST_F(SSDTestFixture, TestEraseCommandWithMock)
 {
     EXPECT_CALL(mockSSD, Erase).Times(1);
     testCmd.Run("SSD.exe E 0 0x00000001");

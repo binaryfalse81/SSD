@@ -3,9 +3,9 @@
 #include "ShellCommandFactory.h"
 #include "../Logger/Logger.cpp"
 
-ShellCommand* ShellCommandFactory::Make(const string& strCommand)
+ShellCommand* ShellCommandFactory::Make(string strCmd)
 {
-    TokenArgument(strCommand);
+    TokenArgument(strCmd);
     MakeCommand();
     return result;
 }
@@ -15,22 +15,22 @@ VOID ShellCommandFactory::SetSsdDriver(SSDDriver* sd)
     this->sd = sd;
 }
 
-VOID ShellCommandFactory::TokenArgument(const string& strCommand)
+VOID ShellCommandFactory::TokenArgument(string strCmd)
 {
     LOG_PRINT("Separate commands into tokens");
     string token;
     size_t start = 0, end = 0;
     CommandToken.clear();
 
-    while ((end = strCommand.find(' ', start)) != string::npos)
+    while ((end = strCmd.find(' ', start)) != string::npos)
     {
-        token = strCommand.substr(start, end - start);
+        token = strCmd.substr(start, end - start);
         CommandToken.push_back(token);
         start = end + 1;
     }
 
     // 마지막 단어 처리
-    token = strCommand.substr(start);
+    token = strCmd.substr(start);
     CommandToken.push_back(token);
 }
 
@@ -66,13 +66,13 @@ ShellCommand* ShellCommandFactory::MakeWriteCommand()
         return new InvalidCommand();
     }
 
-    // Check Invalid 2) LBA
+    // Check Invalid 2) nLpn
     if (IsStringDecimal(CommandToken[1]) == false)
     {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLBA(CommandToken[1]) == false)
+    if (IsStringValidLpn(CommandToken[1]) == false)
     {
         return new InvalidCommand();
     }
@@ -95,13 +95,13 @@ ShellCommand* ShellCommandFactory::MakeReadCommand()
         return new InvalidCommand();
     }
 
-    // Check Invalid 2) LBA
+    // Check Invalid 2) nLpn
     if (IsStringDecimal(CommandToken[1]) == false)
     {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLBA(CommandToken[1]) == false)
+    if (IsStringValidLpn(CommandToken[1]) == false)
     {
         return new InvalidCommand();
     }
@@ -117,13 +117,13 @@ ShellCommand* ShellCommandFactory::MakeEraseCommand()
         return new InvalidCommand();
     }
 
-    // Check Invalid 2) LBA
+    // Check Invalid 2) nLpn
     if (IsStringDecimal(CommandToken[1]) == false)
     {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLBA(CommandToken[1]) == false)
+    if (IsStringValidLpn(CommandToken[1]) == false)
     {
         return new InvalidCommand();
     }
@@ -150,18 +150,18 @@ ShellCommand* ShellCommandFactory::MakeEraseRangeCommand()
         return new InvalidCommand();
     }
 
-    // Check Invalid 2) StartLBA
+    // Check Invalid 2) StartLpn
     if (IsStringDecimal(CommandToken[1]) == false)
     {
         return new InvalidCommand();
     }
 
-    if (IsStringValidLBA(CommandToken[1]) == false)
+    if (IsStringValidLpn(CommandToken[1]) == false)
     {
         return new InvalidCommand();
     }
 
-    // Check Invalid 3) EndLBA
+    // Check Invalid 3) EndLpn
     if (IsStringDecimal(CommandToken[2]) == false)
     {
         return new InvalidCommand();
@@ -173,7 +173,7 @@ ShellCommand* ShellCommandFactory::MakeEraseRangeCommand()
         return new InvalidCommand();
     }
 
-    return new EraseRangeCommand(LimitToMinLBA(CommandToken[1]), LimitToMaxLBA(CommandToken[2]));
+    return new EraseRangeCommand(CommandToken[1], CommandToken[2]);
 }
 
 ShellCommand* ShellCommandFactory::MakeFlushCommand()
@@ -259,7 +259,7 @@ ShellCommand* ShellCommandFactory::MakeCompareCommand()
     return new Compare();
 }
 
-bool ShellCommandFactory::IsStringDecimal(const string& str)
+bool ShellCommandFactory::IsStringDecimal(string str)
 {
     for (CHAR ch = 0; ch < str.size(); ch++)
     {
@@ -271,16 +271,16 @@ bool ShellCommandFactory::IsStringDecimal(const string& str)
     return true;
 }
 
-bool ShellCommandFactory::IsStringHexadecimal(const string& str)
+bool ShellCommandFactory::IsStringHexadecimal(string str)
 {
     if ((str[0] != '0') ||
         (str[1] != 'x') ||
-        (str.size() != MAX_STR_LENGTH_DATA))
+        (str.size() != MAX_PATTERN_LENGTH))
     {
         return false;
     }
 
-    for (INT32 idx = 2; idx < str.size(); idx++)
+    for (UINT32 idx = 2; idx < str.size(); idx++)
     {
         if (('0' > str[idx] || str[idx] > '9') &&
             ('A' > str[idx] || str[idx] > 'F'))
@@ -291,45 +291,23 @@ bool ShellCommandFactory::IsStringHexadecimal(const string& str)
     return true;
 }
 
-bool ShellCommandFactory::IsStringValidLBA(const string& str)
+bool ShellCommandFactory::IsStringValidLpn(string str)
 {
-    INT32 LBA = stoi(str);
-    if ((sd->GetMinLBA() <= LBA) && (LBA <= sd->GetMaxLBA()))
+    UINT32 nLpn = stoi(str);
+    if (nLpn < MAX_LPN)
     {
         return true;
     }
     return false;
 }
 
-bool ShellCommandFactory::IsStringValidLength(const string& str)
+bool ShellCommandFactory::IsStringValidLength(string str)
 {
     return (stoi(str) > 0);
 }
 
-bool ShellCommandFactory::IsStringValidLength(const string& strStartLBA, const string& strEndLBA)
+bool ShellCommandFactory::IsStringValidLength(string strStartLpn, string strEndLpn)
 {
-    return ((stoi(strEndLBA) - stoi(strStartLBA)) > 0);
+    return ((stoi(strEndLpn) - stoi(strStartLpn)) > 0);
 }
 
-
-string ShellCommandFactory::LimitToMinLBA(const string& str)
-{
-    INT32 LBA = stoi(str);
-    if (LBA < sd->GetMinLBA())
-    {
-        LBA = sd->GetMinLBA();
-    }
-
-    return to_string(LBA);
-}
-
-string ShellCommandFactory::LimitToMaxLBA(const string& str)
-{
-    INT32 LBA = stoi(str);
-    if (LBA > sd->GetMaxLBA() + 1)
-    {
-        LBA = sd->GetMaxLBA() + 1;
-    }
-
-    return to_string(LBA);
-}

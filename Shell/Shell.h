@@ -7,11 +7,11 @@
 class Shell
 {
 public:
-    VOID Run(const string& str);
+    VOID Run(string str);
     VOID SetSsdDriver(SSDDriver* sd);
 
 private:
-    SSDDriver* ssdDriver;
-    ShellCommandFactory shellCommandFactory;
-    ShellCommand* shellCommand;
+    SSDDriver* sd;
+    ShellCommandFactory scf;
+    ShellCommand* sc;
 };

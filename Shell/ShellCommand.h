@@ -7,10 +7,6 @@ class ShellCommand
 {
 public:
      virtual VOID Run(SSDDriver* sd) = 0;
-
-protected:
-     const INT32 MAX_LBA = 99;
-     const INT32 MIN_LBA = 0;
 };
 
 
@@ -24,50 +20,50 @@ public:
 class WriteCommand : public ShellCommand
 {
 public:
-    WriteCommand(string strLBA, string strData);
+    WriteCommand(string strLpn, string strPattern);
     VOID Run(SSDDriver* sd) override;
 
 private:
-    INT32 nLBA;
-    string strLBA;
-    string strData;
+    UINT32 nLpn;
+    string strLpn;
+    string strPattern;
 };
 
 class ReadCommand : public ShellCommand
 {
 public:
-    explicit ReadCommand(string strLBA);
+    explicit ReadCommand(string strLpn);
     VOID Run(SSDDriver* sd) override;
 
 private:
-    INT32 nLBA;
-    string strLBA;
+    UINT32 nLpn;
+    string strLpn;
 };
 
 class EraseCommand : public ShellCommand
 {
 public:
-    EraseCommand(string strStartLBA, string strSize);
+    EraseCommand(string strStartLpn, string strSize);
     VOID Run(SSDDriver* sd) override;
 
 private:
-    INT32 nStartLBA;
-    INT32 nSize;
-    string strStartLBA;
+    UINT32 nLpn;
+    UINT32 nSize;
+    string strLpn;
     string strSize;
 };
 
 class EraseRangeCommand : public ShellCommand
 {
 public:
-    EraseRangeCommand(string strStartLBA, string strEndLBA);
+    EraseRangeCommand(string strStartLpn, string strEndLpn);
     VOID Run(SSDDriver* sd) override;
 
 private:
-    INT32 nStartLBA;
-    INT32 nEndLBA;
-    string strStartLBA;
-    string strEndLBA;
+    UINT32 nLpnStart;
+    UINT32 nLpnEnd;
+    string strStartLpn;
+    string strEndLpn;
 };
 
 class FlushCommand : public ShellCommand
@@ -101,11 +97,11 @@ public:
 class FullWriteCommand : public ShellCommand
 {
 public:
-    explicit FullWriteCommand(string strData);
+    explicit FullWriteCommand(string strPattern);
     VOID Run(SSDDriver* sd) override;
 
 private:
-    string strData;
+    string strPattern;
 };
 
 class FullReadCommand : public ShellCommand

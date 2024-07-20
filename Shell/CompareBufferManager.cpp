@@ -2,11 +2,11 @@
 #include "CompareBufferManager.h"
 #include "../Logger/Logger.cpp"
 
-VOID CompareBufferMgr::SetCompareData(INT32 LBA, string Data)
+VOID CompareBufferMgr::SetCompareData(UINT32 nLpn, string strPattern)
 {
-    if (0 <= LBA && LBA < CONFIG_MAX_LBA)
+    if (nLpn < MAX_LPN)
     {
-        compareData[LBA] = Data;
+        compareData[nLpn] = strPattern;
     }
 }
 
@@ -15,20 +15,20 @@ bool CompareBufferMgr::CompareBuf()
     string ReadFileName{ "nand.txt" };
     ifstream resultFile(ReadFileName);
     string line;
-    INT32 LBA = 0;
+    UINT32 nLpn = 0;
 
     if (resultFile.is_open())
     {
         while (getline(resultFile, line))
         {
-            LBA_INFO LbaInfo = Parse(line);
-            if (LbaInfo.LBAData != compareData[LBA])
+            NAND_DATA LbaInfo = Parse(line);
+            if (LbaInfo.strPattern != compareData[nLpn])
             {
                 return false;
             }
 
-            LBA++;
-            if (LBA >= CONFIG_MAX_LBA)
+            nLpn++;
+            if (nLpn >= MAX_LPN)
             {
                 break;
             }
@@ -37,9 +37,9 @@ bool CompareBufferMgr::CompareBuf()
     }
     else
     {
-        for (LBA = 0; LBA < CONFIG_MAX_LBA; LBA++)
+        for (nLpn = 0; nLpn < MAX_LPN; nLpn++)
         {
-            if (compareData[LBA] != ERASE_DATA)
+            if (compareData[nLpn] != UNMAPED_PATTERN)
             {
                 return false;
             }
@@ -49,21 +49,21 @@ bool CompareBufferMgr::CompareBuf()
     return true;
 }
 
-LBA_INFO CompareBufferMgr::Parse(const string& line)
+NAND_DATA CompareBufferMgr::Parse(string line)
 {
-    LBA_INFO LbaInfo;
-    INT32 firstSpacePos = (INT32)line.find(' ');
-    INT32 secondSpacePos = (INT32)line.find(' ', firstSpacePos + 1);
-    LbaInfo.LBA = stoi(line.substr(0, firstSpacePos));
+    NAND_DATA LbaInfo;
+    UINT32 firstSpacePos = (UINT32)line.find(' ');
+    UINT32 secondSpacePos = (UINT32)line.find(' ', firstSpacePos + 1);
+    LbaInfo.nLpn = stoi(line.substr(0, firstSpacePos));
     if (secondSpacePos == string::npos)
     {
-        LbaInfo.LBASize = 1;
-        LbaInfo.LBAData = line.substr(firstSpacePos + 1);
+        LbaInfo.nSize = 1;
+        LbaInfo.strPattern = line.substr(firstSpacePos + 1);
     }
     else
     {
-        LbaInfo.LBAData = line.substr(firstSpacePos + 1, secondSpacePos - (firstSpacePos + 1));
-        LbaInfo.LBASize = stoi(line.substr(secondSpacePos + 1));
+        LbaInfo.strPattern = line.substr(firstSpacePos + 1, secondSpacePos - (firstSpacePos + 1));
+        LbaInfo.nSize = stoi(line.substr(secondSpacePos + 1));
     }
     return LbaInfo;
 }
