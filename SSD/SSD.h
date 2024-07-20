@@ -1,45 +1,35 @@
 // Copyright.2024.binaryfalse81@gmail.com
 #pragma once
 #include "Header.h"
-#include"SSDInterface.h"
+#include"Disk.h"
 
-typedef struct
-{
-    INT32 LBA;
-    string LBAData;
-    INT32 LBASize;
-} CmdContent;
-
-class SSD : public SSDInterface
+class SSD : public Disk
 {
 public:
-    virtual VOID Write(const INT32& LBA, const string& data) override;
-    virtual VOID Read(const INT32 &LBA) override;
-    virtual VOID Erase(const INT32 &LBA, const INT32 &size) override;
+    virtual VOID Write(const UINT32& nLpn, const string& strPattern) override;
+    virtual VOID Read(const UINT32& nLpn) override;
+    virtual VOID Erase(const UINT32& nLpn, const UINT32& nSize) override;
     virtual VOID Flush() override;
 
 private:
     map<INT32, string> memory;
     unordered_map<INT32, string> validDataMap;
-    INT32 isUsedBuffer[100];
-    string InitialLBAData{ "0x00000000" };
+    INT32 isUsedBuffer[MAX_LPN];
     string WriteFIleName{ "nand.txt" };
     string ReadFileName{ "result.txt" };
     string CommandBufferFileName{ "buffer.txt" };
     string DataPreFix{ "0x" };
-    const INT32 MAX_LBA{ 99 };
-    const INT32 MIN_LBA{ 0 };
-    const INT32 InitialUpdateSize{1};
-    const INT32 Buffer_MAX_LINE{10};
-    const INT32 DATA_LENGTH{10};
+    const UINT32 InitialUpdateSize{1};
+    const UINT32 Buffer_MAX_LINE{10};
+    const UINT32 DATA_LENGTH{10};
 
-    CmdContent ParseCmd(const string &line);
-    vector<string> FindLBAData(const INT32 &LBA);
-    bool IsInLBA(const INT32 &LBA, CmdContent &bufferData);
-    VOID StoreCommand(const INT32 &LBA, const string &data, const INT32 &size);
+    NAND_DATA ParseCmd(const string &line);
+    vector<string> FindLpnData(const UINT32 &nLpn);
+    bool IsInLpn(const UINT32 &nLpn, NAND_DATA& bufferData);
+    VOID StoreCommand(const UINT32& nLpn, const string& strPattern, const INT32& nSize);
     VOID CheckFlush(const INT32& bufferSize);
     VOID ReadMemory();
-    VOID UpdateMemory(const INT32 &LBA, const string &data, const INT32 &size);
+    VOID UpdateMemory(const UINT32& nLpn, const string& strPattern, const INT32& nSize);
     VOID UpdateMemoryWithBuffer(const vector<string> &lines);
     VOID UpdateMemoryWithCmd(const vector<string> &lines);
     VOID CheckValidCommand(const vector<string> &lines);
@@ -47,12 +37,12 @@ private:
     VOID StoreMemory();
     vector<string> ReadFile(const string& FileName);
     VOID WriteFile(const string& FileName, vector<string>& lines);
-    VOID CheckWriteCondition(const INT32& LBA, const string& data);
-    VOID CheckEraseCondition(const INT32& LBA, const INT32& size);
-    VOID CheckLBARange(const INT32& LBA);
+    VOID CheckWriteCondition(const UINT32& nLpn, const string& data);
+    VOID CheckEraseCondition(const UINT32& nLpn, const UINT32& nSize);
+    VOID CheckLpnRange(const UINT32& nLpn);
     VOID CheckDataLength(const string& data);
     VOID CheckDataPreFix(const string& data);
     VOID CheckDataType(const string& data);
-    VOID CheckEraseSizeRange(const INT32 &size);
+    VOID CheckEraseSizeRange(const INT32& nSize);
     bool isHexData(const CHAR& data);
 };

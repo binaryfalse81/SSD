@@ -28,7 +28,7 @@
     <ClInclude Include="Parser.h" />
     <ClInclude Include="SSD.h" />
     <ClInclude Include="SSDCommand.h" />
-    <ClInclude Include="SSDInterface.h" />
+    <ClInclude Include="Disk.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

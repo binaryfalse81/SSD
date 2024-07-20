@@ -5,8 +5,8 @@
 class Disk
 {
 public:
-    virtual VOID Write(UINT32 nLpn, string strPattern) = 0;
-    virtual VOID Read(UINT32 nLpn) = 0;
-    virtual VOID Erase(UINT32 nLpn, UINT32 nSize) = 0;
+    virtual VOID Write(const UINT32& nLpn, const string& strPattern) = 0;
+    virtual VOID Read(const UINT32& nLpn) = 0;
+    virtual VOID Erase(const UINT32& nLpn, const UINT32& nSize) = 0;
     virtual VOID Flush() = 0;
 };

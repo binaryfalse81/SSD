@@ -16,8 +16,8 @@ INT32 main(INT32 argc, CHAR* argv[])
 {
     Parser parser;
     SSD ssd;
-    CmdStatus status;
-    SSDCommand cmd{ &ssd, &parser, &status };
+    CMD_INFO stCmdInfo;
+    SSDCommand cmd{ &ssd, &parser, &stCmdInfo };
     string arg{ argv[0] };
 
     arg += GetConcatenateArgv(argc, argv);
@@ -63,8 +63,8 @@ extern "C" __declspec(dllexport) INT32 ExecuteCommand(const wchar_t* cmdLine)
 {
     Parser parser;
     SSD ssd;
-    CmdStatus status;
-    SSDCommand cmd{ &ssd, &parser, &status };
+    CMD_INFO stCmdInfo;
+    SSDCommand cmd{ &ssd, &parser, &stCmdInfo };
     string arg = " " + WideCharToString(cmdLine);
     cmd.Run(arg);
     return 0;

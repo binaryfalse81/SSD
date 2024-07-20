@@ -3,19 +3,19 @@
 #include "Header.h"
 #include "SSD.h"
 #include "Parser.h"
-#include "SSDInterface.h"
+#include "Disk.h"
 
 class SSDCommand
 {
 public:
-    SSDCommand(SSDInterface* ssd, Parser* parser, CmdStatus* cmd)
-        : ssd(ssd), parser(parser), cmd(cmd) {}
+    SSDCommand(Disk* disk, Parser* parser, CMD_INFO* pstCmdInfo)
+        : disk(disk), parser(parser), pstCmdInfo(pstCmdInfo) {}
     VOID Run(const string& str);
 
 private:
-    SSDInterface *ssd;
+    Disk* disk;
     Parser* parser;
-    CmdStatus* cmd;
+    CMD_INFO* pstCmdInfo;
     VOID _Read();
     VOID _Write();
     VOID _Erase();

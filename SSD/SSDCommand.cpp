@@ -4,26 +4,26 @@
 #include "SSDCommand.h"
 #include "SSD.h"
 #include "Parser.h"
-#include "SSDInterface.h"
+#include "Disk.h"
 #include "../Logger/Logger.cpp"
 
-VOID SSDCommand::Run(const string& strCommand)
+VOID SSDCommand::Run(const string& strCmd)
 {
-    cmd = parser->Parse(strCommand);
+    pstCmdInfo = parser->Parse(strCmd);
 
-    if (cmd->Command == CmdType::Write)
+    if (pstCmdInfo->eCmdType == ENUM_CMD_TYPE::Write)
     {
         _Write();
     }
-    else if (cmd->Command == CmdType::Read)
+    else if (pstCmdInfo->eCmdType == ENUM_CMD_TYPE::Read)
     {
         _Read();
     }
-    else if (cmd->Command == CmdType::Erase)
+    else if (pstCmdInfo->eCmdType == ENUM_CMD_TYPE::Erase)
     {
         _Erase();
     }
-    else if (cmd->Command == CmdType::Flush)
+    else if (pstCmdInfo->eCmdType == ENUM_CMD_TYPE::Flush)
     {
         _Flush();
     }
@@ -32,23 +32,23 @@ VOID SSDCommand::Run(const string& strCommand)
 VOID SSDCommand::_Write()
 {
     LOG_PRINT("send W cmd");
-    ssd->Write(stoi(cmd->LBA), cmd->LBAData);
+    disk->Write(stoi(pstCmdInfo->nLpn), pstCmdInfo->strPattern);
 }
 
 VOID SSDCommand::_Read()
 {
     LOG_PRINT("send R cmd");
-    ssd->Read(stoi(cmd->LBA));
+    disk->Read(stoi(pstCmdInfo->nLpn));
 }
 
 VOID SSDCommand::_Erase()
 {
     LOG_PRINT("send E cmd");
-    ssd->Erase(stoi(cmd->LBA), cmd->EraseSize);
+    disk->Erase(stoi(pstCmdInfo->nLpn), pstCmdInfo->nEraseSize);
 }
 
 VOID SSDCommand::_Flush()
 {
     LOG_PRINT("send F cmd");
-    ssd->Flush();
+    disk->Flush();
 }

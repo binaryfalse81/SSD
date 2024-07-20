@@ -3,29 +3,31 @@
 #include"SSD.h"
 #include "../Logger/Logger.cpp"
 
-class LBARangeException : public exception {};
+string UNMAPED_PATTERN = "0x00000000";
+
+class LpnRangeException : public exception {};
 class DataRangeException : public exception {};
 class DataPreFIxException : public exception {};
 class DataTypeException : public exception {};
 class EraseSizeException : public exception {};
 
-VOID SSD::Write(const INT32& LBA, const string& data)
+VOID SSD::Write(const UINT32& nLpn, const string& strPattern)
 {
-    CheckWriteCondition(LBA, data);
-    StoreCommand(LBA, data, InitialUpdateSize);
+    CheckWriteCondition(nLpn, strPattern);
+    StoreCommand(nLpn, strPattern, InitialUpdateSize);
 }
 
-VOID SSD::Read(const INT32& LBA)
+VOID SSD::Read(const UINT32& nLpn)
 {
-    CheckLBARange(LBA);
-    vector<string> readLine = FindLBAData(LBA);
+    CheckLpnRange(nLpn);
+    vector<string> readLine = FindLpnData(nLpn);
     WriteFile(ReadFileName, readLine);
 }
 
-VOID SSD::Erase(const INT32& LBA, const INT32& size)
+VOID SSD::Erase(const UINT32& nLpn, const UINT32& nSize)
 {
-    CheckEraseCondition(LBA, size);
-    StoreCommand(LBA, InitialLBAData, size);
+    CheckEraseCondition(nLpn, nSize);
+    StoreCommand(nLpn, UNMAPED_PATTERN, nSize);
 }
 
 VOID SSD::Flush()
@@ -38,50 +40,50 @@ VOID SSD::Flush()
     StoreMemory();
 }
 
-CmdContent SSD::ParseCmd(const string& line)
+NAND_DATA SSD::ParseCmd(const string& line)
 {
-    CmdContent LBAData;
+    NAND_DATA strPattern;
     INT32 firstSpacePosition = (INT32)line.find(' ');
     INT32 secondSpacePosition = (INT32)line.find(' ', firstSpacePosition + 1);
-    LBAData.LBA = stoi(line.substr(0, firstSpacePosition));
+    strPattern.nLpn = stoi(line.substr(0, firstSpacePosition));
     if (secondSpacePosition == string::npos)
     {
-        LBAData.LBASize = 1;
-        LBAData.LBAData = line.substr(firstSpacePosition + 1);
+        strPattern.nSize = 1;
+        strPattern.strPattern = line.substr(firstSpacePosition + 1);
     }
     else
     {
-        LBAData.LBAData = line.substr(firstSpacePosition + 1, secondSpacePosition - (firstSpacePosition + 1));
-        LBAData.LBASize = stoi(line.substr(secondSpacePosition + 1));
+        strPattern.strPattern = line.substr(firstSpacePosition + 1, secondSpacePosition - (firstSpacePosition + 1));
+        strPattern.nSize = stoi(line.substr(secondSpacePosition + 1));
     }
-    return LBAData;
+    return strPattern;
 }
 
-vector<string> SSD::FindLBAData(const INT32& LBA)
+vector<string> SSD::FindLpnData(const UINT32& nLpn)
 {
     vector<string> lines = ReadFile(CommandBufferFileName);
     for (INT32 line_index = (INT32)lines.size() - 1; line_index >= 0; line_index--)
     {
         string line = lines[line_index];
-        CmdContent bufferData = ParseCmd(line);
-        if (IsInLBA(LBA, bufferData))
-            return { bufferData.LBAData };
+        NAND_DATA stNandData = ParseCmd(line);
+        if (IsInLpn(nLpn, stNandData))
+            return { stNandData.strPattern };
     }
 
     ReadMemory();
-    return { memory[LBA] };
+    return { memory[nLpn] };
 }
 
-bool SSD::IsInLBA(const INT32& LBA, CmdContent& bufferData)
+bool SSD::IsInLpn(const UINT32& nLpn, NAND_DATA& stNandData)
 {
-    return LBA >= bufferData.LBA && LBA < (bufferData.LBA + bufferData.LBASize);
+    return nLpn >= stNandData.nLpn && nLpn < (stNandData.nLpn + stNandData.nSize);
 }
 
-VOID SSD::StoreCommand(const INT32& LBA, const string& data, const INT32& size)
+VOID SSD::StoreCommand(const UINT32& nLpn, const string& strPattern, const INT32& nSize)
 {
     LOG_PRINT("store new cmd into 'Command Buffer'");
     vector<string> lines = ReadFile(CommandBufferFileName);
-    lines.push_back(to_string(LBA) + " " + data + " " + to_string(size));
+    lines.push_back(to_string(nLpn) + " " + strPattern + " " + to_string(nSize));
     WriteFile(CommandBufferFileName, lines);
     CheckFlush((INT32)lines.size());
 }
@@ -99,26 +101,26 @@ VOID SSD::ReadMemory()
     vector<string> lines = ReadFile(WriteFIleName);
     for (const auto &line : lines)
     {
-        CmdContent bufferData = ParseCmd(line);
-        UpdateMemory(bufferData.LBA, bufferData.LBAData, bufferData.LBASize);
+        NAND_DATA stNandData = ParseCmd(line);
+        UpdateMemory(stNandData.nLpn, stNandData.strPattern, stNandData.nSize);
     }
 
     if (lines.empty())
     {
-        for (INT32 i = 0; i <= MAX_LBA; i++)
+        for (UINT32 i = 0; i < MAX_LPN; i++)
         {
-            memory[i] = InitialLBAData;
+            memory[i] = UNMAPED_PATTERN;
         }
     }
 }
 
-VOID SSD::UpdateMemory(const INT32& LBA, const string& data, const INT32& size)
+VOID SSD::UpdateMemory(const UINT32& nLpn, const string& strPattern, const INT32& nSize)
 {
-    INT32 endLBA = LBA + size;
-    endLBA = endLBA > MAX_LBA ? MAX_LBA + 1 : endLBA;
-    for (INT32 iLBA = LBA; iLBA < endLBA; iLBA++)
+    UINT32 endLpn = nLpn + nSize;
+    endLpn = (endLpn >= MAX_LPN) ? MAX_LPN : endLpn;
+    for (UINT32 i = nLpn; i < endLpn; i++)
     {
-        memory[iLBA] = data;
+        memory[i] = strPattern;
     }
 }
 
@@ -128,13 +130,13 @@ VOID SSD::CheckValidCommand(const vector<string> &lines)
     validDataMap.clear();
     for (auto line_it = lines.rbegin(); line_it != lines.rend(); line_it++)
     {
-        CmdContent bufferData = ParseCmd(*line_it);
-        for (INT32 LBA_i = bufferData.LBA;  LBA_i < bufferData.LBA + bufferData.LBASize; LBA_i++)
+        NAND_DATA stNandData = ParseCmd(*line_it);
+        for (UINT32 i = stNandData.nLpn;  i < stNandData.nLpn + stNandData.nSize; i++)
         {
-            if (!isUsedBuffer[LBA_i])
+            if (!isUsedBuffer[i])
             {
-                validDataMap[LBA_i] = bufferData.LBAData;
-                isUsedBuffer[LBA_i] = 1;
+                validDataMap[i] = stNandData.strPattern;
+                isUsedBuffer[i] = 1;
             }
         }
     }
@@ -142,11 +144,11 @@ VOID SSD::CheckValidCommand(const vector<string> &lines)
 
 VOID SSD::RunValidCommand()
 {
-    for (INT32 LBA_i = MIN_LBA; LBA_i < MAX_LBA + 1; LBA_i++)
+    for (UINT32 i = 0; i < MAX_LPN; i++)
     {
-        if (isUsedBuffer[LBA_i])
+        if (isUsedBuffer[i])
         {
-            UpdateMemory(LBA_i, validDataMap[LBA_i], InitialUpdateSize);
+            UpdateMemory(i, validDataMap[i], InitialUpdateSize);
         }
     }
 }
@@ -156,35 +158,35 @@ VOID SSD::StoreMemory()
     ofstream file(WriteFIleName);
     if (file.is_open())
     {
-        for (INT32 LBA = 0; LBA <= MAX_LBA; LBA++)
+        for (UINT32 nLpn = 0; nLpn < MAX_LPN; nLpn++)
         {
-            file << LBA << " " << memory[LBA] << "\n";
+            file << nLpn << " " << memory[nLpn] << "\n";
         }
         file.close();
     }
 }
 
-vector<string> SSD::ReadFile(const string& FileName)
+vector<string> SSD::ReadFile(const string& strFileName)
 {
-    vector<string> lines;
-    ifstream file(FileName);
-    string line;
+    vector<string> astrLines;
+    ifstream file(strFileName);
+    string strCmd;
 
     if (file.is_open())
     {
-        while (getline(file, line))
+        while (getline(file, strCmd))
         {
-            lines.push_back(line);
+            astrLines.push_back(strCmd);
         }
         file.close();
     }
 
-    return lines;
+    return astrLines;
 }
 
-VOID SSD::WriteFile(const string& FileName, vector<string>& lines)
+VOID SSD::WriteFile(const string& strFileName, vector<string>& lines)
 {
-    ofstream file(FileName);
+    ofstream file(strFileName);
     if (file.is_open())
     {
         for (const auto& line : lines)
@@ -195,56 +197,55 @@ VOID SSD::WriteFile(const string& FileName, vector<string>& lines)
     }
 }
 
-VOID SSD::CheckWriteCondition(const INT32& LBA, const string& data)
+VOID SSD::CheckWriteCondition(const UINT32& nLpn, const string& strPattern)
 {
-    CheckLBARange(LBA);
-    CheckDataLength(data);
-    CheckDataPreFix(data);
-    CheckDataType(data);
+    CheckLpnRange(nLpn);
+    CheckDataLength(strPattern);
+    CheckDataPreFix(strPattern);
+    CheckDataType(strPattern);
 }
 
-VOID SSD::CheckEraseCondition(const INT32& LBA, const INT32& size)
+VOID SSD::CheckEraseCondition(const UINT32& nLpn, const UINT32& nSize)
 {
-    CheckLBARange(LBA);
-    CheckEraseSizeRange(size);
-    CheckLBARange(LBA + size - 1);
+    CheckLpnRange(nLpn);
+    CheckEraseSizeRange(nSize);
+    CheckLpnRange(nLpn + nSize - 1);
 }
 
-VOID SSD::CheckLBARange(const INT32& LBA)
+VOID SSD::CheckLpnRange(const UINT32& nLpn)
 {
-    if (LBA < 0 || LBA > MAX_LBA)
-        throw LBARangeException();
+    if (nLpn >= MAX_LPN)
+        throw LpnRangeException();
 }
 
-VOID SSD::CheckDataLength(const string& data)
+VOID SSD::CheckDataLength(const string& strPattern)
 {
-    if (data.length() != DATA_LENGTH)
+    if (strPattern.length() != DATA_LENGTH)
         throw DataRangeException();
 }
 
-VOID SSD::CheckDataPreFix(const string& data)
+VOID SSD::CheckDataPreFix(const string& strPattern)
 {
-    if (data.substr(0, 2) != DataPreFix)
+    if (strPattern.substr(0, 2) != DataPreFix)
         throw DataPreFIxException();
 }
 
-VOID SSD::CheckDataType(const string& data)
+VOID SSD::CheckDataType(const string& strPattern)
 {
-    for (INT32 i = 2; i < data.length(); i++)
+    for (UINT32 i = 2; i < strPattern.length(); i++)
     {
-        if (isHexData(data[i]))continue;
+        if (isHexData(strPattern[i])) continue;
         throw DataTypeException();
     }
 }
 
-VOID SSD::CheckEraseSizeRange(const INT32& size)
+VOID SSD::CheckEraseSizeRange(const INT32& nSize)
 {
-    if (size > 10 || size < 0)
+    if (nSize > 10)
         throw EraseSizeException();
 }
 
-bool SSD::isHexData(const CHAR& data)
+bool SSD::isHexData(const CHAR& ch)
 {
-    return (0 <= data - '0' && data - '0' < 10)
-        || ('A' <= data && data <= 'F');
+    return (0 <= ch - '0' && ch - '0' < 10) || ('A' <= ch && ch <= 'F');
 }

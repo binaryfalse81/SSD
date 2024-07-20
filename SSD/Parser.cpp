@@ -5,104 +5,104 @@
 
 class ArgsLengthNotMatchException : public exception {};
 
-CmdStatus *Parser::Parse(const string &strCommand)
+CMD_INFO *Parser::Parse(const string &strCmd)
 {
-    TokenArgument(strCommand);
-    return UpdateCmdStatus();
+    TokenArgument(strCmd);
+    return UpdateCmdInfo();
 }
 
-VOID Parser::TokenArgument(const string& strCommand)
+VOID Parser::TokenArgument(const string& strCmd)
 {
     LOG_PRINT("Separate commands into tokens");
     string token;
-    size_t start = strCommand.find(' ', 0) + 1;
+    size_t start = strCmd.find(' ', 0) + 1;
     size_t end = start;
 
-    while ((end = strCommand.find(' ', start)) != string::npos)
+    while ((end = strCmd.find(' ', start)) != string::npos)
     {
-        token = strCommand.substr(start, end - start);
-        CommandToken.push_back(token);
+        token = strCmd.substr(start, end - start);
+        astrCmdToken.push_back(token);
         start = end + 1;
     }
 
-    token = strCommand.substr(start);
-    CommandToken.push_back(token);
+    token = strCmd.substr(start);
+    astrCmdToken.push_back(token);
 }
 
-CmdStatus* Parser::UpdateCmdStatus()
+CMD_INFO* Parser::UpdateCmdInfo()
 {
     LOG_PRINT("Generate the appropriate command : W/R/E/F");
-    if (CommandToken[0] == WRITE_CMD) return UpdateWriteCmdStatus();
-    else if (CommandToken[0] == READ_CMD) return UpdateReadCmdStatus();
-    else if (CommandToken[0] == ERASE_CMD) return UpdateEraseCmdStatus();
-    else if (CommandToken[0] == FLUSH_CMD) return UpdateFlushCmdStatus();
+    if (astrCmdToken[0] == WRITE_CMD) return UpdateWriteCmdInfo();
+    else if (astrCmdToken[0] == READ_CMD) return UpdateReadCmdInfo();
+    else if (astrCmdToken[0] == ERASE_CMD) return UpdateEraseCmdInfo();
+    else if (astrCmdToken[0] == FLUSH_CMD) return UpdateFlushCmdInfo();
     return nullptr;
 }
 
-CmdStatus *Parser::UpdateWriteCmdStatus()
+CMD_INFO *Parser::UpdateWriteCmdInfo()
 {
-    CheckWriteCommandToken();
-    CmdStatus* result = new CmdStatus();
-    result->Command = CmdType::Write;
-    result->LBA = CommandToken[1];
-    result->LBAData = CommandToken[2];
-    return result;
+    CheckWriteCmdToken();
+    CMD_INFO* pstCmdInfo = new CMD_INFO();
+    pstCmdInfo->eCmdType = ENUM_CMD_TYPE::Write;
+    pstCmdInfo->nLpn = astrCmdToken[1];
+    pstCmdInfo->strPattern = astrCmdToken[2];
+    return pstCmdInfo;
 }
 
-CmdStatus* Parser::UpdateReadCmdStatus()
+CMD_INFO* Parser::UpdateReadCmdInfo()
 {
-    CheckReadCommandToken();
-    CmdStatus* result = new CmdStatus();
-    result->Command = CmdType::Read;
-    result->LBA = CommandToken[1];
-    return result;
+    CheckReadCmdToken();
+    CMD_INFO* pstCmdInfo = new CMD_INFO();
+    pstCmdInfo->eCmdType = ENUM_CMD_TYPE::Read;
+    pstCmdInfo->nLpn = astrCmdToken[1];
+    return pstCmdInfo;
 }
 
-CmdStatus *Parser::UpdateEraseCmdStatus()
+CMD_INFO *Parser::UpdateEraseCmdInfo()
 {
-    CheckEraseCommandToken();
-    CmdStatus *result = new CmdStatus();
-    result->Command = CmdType::Erase;
-    result->LBA = CommandToken[1];
-    result->EraseSize = stoi(CommandToken[2]);
-    return result;
+    CheckEraseCmdToken();
+    CMD_INFO * pstCmdInfo = new CMD_INFO();
+    pstCmdInfo->eCmdType = ENUM_CMD_TYPE::Erase;
+    pstCmdInfo->nLpn = astrCmdToken[1];
+    pstCmdInfo->nEraseSize = stoi(astrCmdToken[2]);
+    return pstCmdInfo;
 }
 
-CmdStatus *Parser::UpdateFlushCmdStatus()
+CMD_INFO *Parser::UpdateFlushCmdInfo()
 {
-    CheckFlushCommandToken();
-    CmdStatus *result = new CmdStatus();
-    result->Command = CmdType::Flush;
-    return result;
+    CheckFlushCmdToken();
+    CMD_INFO * pstCmdInfo = new CMD_INFO();
+    pstCmdInfo->eCmdType = ENUM_CMD_TYPE::Flush;
+    return pstCmdInfo;
 }
 
-VOID Parser::CheckWriteCommandToken()
+VOID Parser::CheckWriteCmdToken()
 {
-    if (CommandToken.size() != 3)
+    if (astrCmdToken.size() != 3)
     {
         throw ArgsLengthNotMatchException();
     }
 }
 
-VOID Parser::CheckReadCommandToken()
+VOID Parser::CheckReadCmdToken()
 {
-    if (CommandToken.size() != 2)
+    if (astrCmdToken.size() != 2)
     {
         throw ArgsLengthNotMatchException();
     }
 }
 
-VOID Parser::CheckEraseCommandToken()
+VOID Parser::CheckEraseCmdToken()
 {
-    if (CommandToken.size() != 3)
+    if (astrCmdToken.size() != 3)
     {
         throw ArgsLengthNotMatchException();
     }
 }
 
-VOID Parser::CheckFlushCommandToken()
+VOID Parser::CheckFlushCmdToken()
 {
-    if (CommandToken.size() != 1)
+    if (astrCmdToken.size() != 1)
     {
         throw ArgsLengthNotMatchException();
     }
