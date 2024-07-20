@@ -2,12 +2,12 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include <iostream>
+#include <fstream> 
 #include <sstream>
 #include <iomanip>
-#include "../Shell/ShellCommandFactory.cpp"
-#include "../Shell/RealSSDDriver.cpp"
-#include "../Shell/Shell.cpp"
-#include "../Shell/ShellCommand.cpp"
+#include "../Shell/SsdDriver.h"
+#include "../Shell/RealSsdDriver.h"
+#include "../Shell/Shell.h"
 
 using namespace std;
 using namespace testing;
@@ -406,8 +406,6 @@ class RealSsdTestShellFixture : public testing::Test
 public:
     Shell shell;
     RealSSDDriver realSSDDriver;
-    stringstream actualOutput;
-    streambuf* backup_cout;
     int startOneLBA = 3;
     const int MAX_LBA_CNT = 100;
     const string UNMAPPED_DATA = "0x00000000";
@@ -415,24 +413,10 @@ public:
     const string INV_WRITE_DATA = "0xAAGGCCDD";
     const string INVALID_COMMAND = "INVALID COMMAND\n";
     vector<string> strDataList;
-    string MakeFullReadData()
-    {
-        string expectedOutStr;
-        expectedOutStr = "[FullRead]\n";
-        for (int i = 0; i < MAX_LBA_CNT; i++)
-        {
-            expectedOutStr += ("[Read] LBA : " + to_string(i));
-            expectedOutStr += (", Data : " + strDataList[i] + "\n");
-        }
 
-        return expectedOutStr;
-    }
-
-    void VerifyFullReadData()
+    void Compare()
     {
-        shell.Run("fullread");
-        EXPECT_THAT(actualOutput.str(), StrEq(MakeFullReadData()));
-        actualOutput.str("");
+        shell.Run("compare");
     }
 
     void FullWrite(string data)
@@ -469,9 +453,7 @@ public:
 
     void PrintCurrentStep(int step, string stepname)
     {
-        cout.rdbuf(backup_cout);
         cout << "\r [Step #" << step << "] " << stepname;
-        backup_cout = cout.rdbuf(actualOutput.rdbuf());
     }
 
     string MakeRandomData(int randvalue)
@@ -484,7 +466,6 @@ public:
 protected:
     void SetUp() override
     {
-        backup_cout = cout.rdbuf(actualOutput.rdbuf());
         shell.SetSsdDriver(&realSSDDriver);
         FormatSSD();
         strDataList.clear();
@@ -495,7 +476,6 @@ protected:
     }
     void TearDown() override
     {
-        cout.rdbuf(backup_cout);
         cout << endl;
     }
 
@@ -569,7 +549,7 @@ TEST_F(RealSsdTestShellFixture, LongTermTest)
 {
     PrintCurrentStep(0, "FullWrite");
     FullWrite("0xABCDABCD");
-    VerifyFullReadData();
+    Compare();
 
     srand(0);
     for (int i = 0; i < 1000; i++)
@@ -584,6 +564,7 @@ TEST_F(RealSsdTestShellFixture, LongTermTest)
                 if (LBA + Length >= MAX_LBA_CNT) Length = MAX_LBA_CNT - LBA - 1;
                 Write(LBA, Length, MakeRandomData(rand()));
             }
+
             if (i % 5 == 0)
             {
                 PrintCurrentStep(i, "PartialErase");
@@ -592,18 +573,18 @@ TEST_F(RealSsdTestShellFixture, LongTermTest)
                 if (LBA + Length >= MAX_LBA_CNT) Length = MAX_LBA_CNT - LBA - 1;
                 Erase(LBA, Length);
             }
+
             if (i % 23 == 0)
             {
-                PrintCurrentStep(i, "Flush ");
+                PrintCurrentStep(i, "Flush");
                 Flush();
             }
 
-            // Verify가 너무 오래 걸려 Interval을 늘림. TC Fail 시 Interval 조정하여 Verify.
             if (i % 31 == 0)
             {
-                VerifyFullReadData();
+                PrintCurrentStep(i, "Compare");
+                Compare();
             }
-
         }
         catch (...)
         {
