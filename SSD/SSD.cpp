@@ -62,9 +62,9 @@ NAND_DATA SSD::ParseCmd(const string& line)
 vector<string> SSD::FindLpnData(const UINT32& nLpn)
 {
     vector<string> lines = ReadFile(CommandBufferFileName);
-    for (INT32 line_index = (INT32)lines.size() - 1; line_index >= 0; line_index--)
+    for (INT32 i = (INT32)lines.size() - 1; i >= 0; i--)
     {
-        string line = lines[line_index];
+        string line = lines[i];
         NAND_DATA stNandData = ParseCmd(line);
         if (IsInLpn(nLpn, stNandData))
             return { stNandData.strPattern };
@@ -79,7 +79,7 @@ bool SSD::IsInLpn(const UINT32& nLpn, NAND_DATA& stNandData)
     return nLpn >= stNandData.nLpn && nLpn < (stNandData.nLpn + stNandData.nSize);
 }
 
-VOID SSD::StoreCommand(const UINT32& nLpn, const string& strPattern, const INT32& nSize)
+VOID SSD::StoreCommand(const UINT32& nLpn, const string& strPattern, const UINT32& nSize)
 {
     LOG_PRINT("store new cmd into 'Command Buffer'");
     vector<string> lines = ReadFile(CommandBufferFileName);
@@ -114,7 +114,7 @@ VOID SSD::ReadMemory()
     }
 }
 
-VOID SSD::UpdateMemory(const UINT32& nLpn, const string& strPattern, const INT32& nSize)
+VOID SSD::UpdateMemory(const UINT32& nLpn, const string& strPattern, const UINT32& nSize)
 {
     UINT32 endLpn = nLpn + nSize;
     endLpn = (endLpn >= MAX_LPN) ? MAX_LPN : endLpn;
@@ -239,7 +239,7 @@ VOID SSD::CheckDataType(const string& strPattern)
     }
 }
 
-VOID SSD::CheckEraseSizeRange(const INT32& nSize)
+VOID SSD::CheckEraseSizeRange(const UINT32& nSize)
 {
     if (nSize > 10)
         throw EraseSizeException();

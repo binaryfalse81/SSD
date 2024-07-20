@@ -23,10 +23,10 @@ private:
     NAND_DATA ParseCmd(const string &line);
     vector<string> FindLpnData(const UINT32 &nLpn);
     bool IsInLpn(const UINT32 &nLpn, NAND_DATA& bufferData);
-    VOID StoreCommand(const UINT32& nLpn, const string& strPattern, const INT32& nSize);
+    VOID StoreCommand(const UINT32& nLpn, const string& strPattern, const UINT32& nSize);
     VOID CheckFlush(const INT32& bufferSize);
     VOID ReadMemory();
-    VOID UpdateMemory(const UINT32& nLpn, const string& strPattern, const INT32& nSize);
+    VOID UpdateMemory(const UINT32& nLpn, const string& strPattern, const UINT32& nSize);
     VOID UpdateMemoryWithBuffer(const vector<string> &lines);
     VOID UpdateMemoryWithCmd(const vector<string> &lines);
     VOID CheckValidCommand(const vector<string> &lines);
@@ -40,6 +40,6 @@ private:
     VOID CheckDataLength(const string& strPattern);
     VOID CheckDataPreFix(const string& strPattern);
     VOID CheckDataType(const string& strPattern);
-    VOID CheckEraseSizeRange(const INT32& nSize);
+    VOID CheckEraseSizeRange(const UINT32& nSize);
     bool IsHexData(const CHAR& ch);
 };
