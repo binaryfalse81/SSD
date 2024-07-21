@@ -5,17 +5,17 @@
 #include "Parser.h"
 #include "Disk.h"
 
-class SSDCommand
+class SSDCmd
 {
 public:
-    SSDCommand(Disk* disk, Parser* parser, CMD_INFO* pstCmdInfo)
-        : disk(disk), parser(parser), pstCmdInfo(pstCmdInfo) {}
-    VOID Run(const string& str);
+    SSDCmd(Disk* disk, Parser* parser, PARSING_RESULT* pstParsingResult)
+        : disk(disk), parser(parser), pstParsingResult(pstParsingResult) {}
+    VOID Run(const string& strInputCmd);
 
 private:
     Disk* disk;
     Parser* parser;
-    CMD_INFO* pstCmdInfo;
+    PARSING_RESULT* pstParsingResult;
     VOID _Read();
     VOID _Write();
     VOID _Erase();

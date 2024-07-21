@@ -3,16 +3,16 @@
   <ItemGroup>
     <ClCompile Include="RealSSDDriver.cpp" />
     <ClCompile Include="Shell.cpp" />
-    <ClCompile Include="ShellCommand.cpp" />
-    <ClCompile Include="ShellCommandFactory.cpp" />
+    <ClCompile Include="ShellCmd.cpp" />
+    <ClCompile Include="ShellCmdFactory.cpp" />
     <ClCompile Include="ShellMain.cpp" />
     <ClCompile Include="VerifyMgr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealSSDDriver.h" />
     <ClInclude Include="Shell.h" />
-    <ClInclude Include="ShellCommand.h" />
-    <ClInclude Include="ShellCommandFactory.h" />
+    <ClInclude Include="ShellCmd.h" />
+    <ClInclude Include="ShellCmdFactory.h" />
     <ClInclude Include="SSDDriver.h" />
     <ClInclude Include="VerifyMgr.h" />
   </ItemGroup>

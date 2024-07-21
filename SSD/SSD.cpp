@@ -3,7 +3,7 @@
 #include"SSD.h"
 #include "../Logger/Logger.cpp"
 
-string UNMAPED_PATTERN = "0x00000000";
+const string UNMAPED_PATTERN = "0x00000000";
 
 class LpnRangeException : public exception {};
 class DataRangeException : public exception {};
@@ -40,21 +40,21 @@ VOID SSD::Flush()
     StoreNAND();
 }
 
-NAND_DATA SSD::ParseCmd(const string& line)
+NAND_DATA SSD::ParseCmd(const string& strLine)
 {
     NAND_DATA strPattern;
-    INT32 firstSpacePosition = (INT32)line.find(' ');
-    INT32 secondSpacePosition = (INT32)line.find(' ', firstSpacePosition + 1);
-    strPattern.nLpn = stoi(line.substr(0, firstSpacePosition));
+    INT32 firstSpacePosition = (INT32)strLine.find(' ');
+    INT32 secondSpacePosition = (INT32)strLine.find(' ', firstSpacePosition + 1);
+    strPattern.nLpn = stoi(strLine.substr(0, firstSpacePosition));
     if (secondSpacePosition == string::npos)
     {
         strPattern.nSize = 1;
-        strPattern.strPattern = line.substr(firstSpacePosition + 1);
+        strPattern.strPattern = strLine.substr(firstSpacePosition + 1);
     }
     else
     {
-        strPattern.strPattern = line.substr(firstSpacePosition + 1, secondSpacePosition - (firstSpacePosition + 1));
-        strPattern.nSize = stoi(line.substr(secondSpacePosition + 1));
+        strPattern.strPattern = strLine.substr(firstSpacePosition + 1, secondSpacePosition - (firstSpacePosition + 1));
+        strPattern.nSize = stoi(strLine.substr(secondSpacePosition + 1));
     }
     return strPattern;
 }
@@ -64,8 +64,8 @@ vector<string> SSD::FindLpnData(const UINT32& nLpn)
     vector<string> lines = ReadFile(strBufferFileName);
     for (INT32 i = (INT32)lines.size() - 1; i >= 0; i--)
     {
-        string line = lines[i];
-        NAND_DATA stNandData = ParseCmd(line);
+        string strLine = lines[i];
+        NAND_DATA stNandData = ParseCmd(strLine);
         if (IsInLpn(nLpn, stNandData))
             return { stNandData.strPattern };
     }
@@ -88,9 +88,9 @@ VOID SSD::StoreCommand(const UINT32& nLpn, const string& strPattern, const UINT3
     CheckFlush((INT32)lines.size());
 }
 
-VOID SSD::CheckFlush(const INT32& bufferSize)
+VOID SSD::CheckFlush(const INT32& nBufSize)
 {
-    if (bufferSize == MAX_CMD_BUF_CNT)
+    if (nBufSize == MAX_CMD_BUF_CNT)
     {
         Flush();
     }
@@ -99,9 +99,9 @@ VOID SSD::CheckFlush(const INT32& bufferSize)
 VOID SSD::ReadNAND()
 {
     vector<string> lines = ReadFile("nand.txt");
-    for (const auto &line : lines)
+    for (const auto &strLine : lines)
     {
-        NAND_DATA stNandData = ParseCmd(line);
+        NAND_DATA stNandData = ParseCmd(strLine);
         UpdateNAND(stNandData.nLpn, stNandData.strPattern, stNandData.nSize);
     }
 
@@ -190,9 +190,9 @@ VOID SSD::WriteFile(const string& strFileName, vector<string>& lines)
     ofstream FileStream(strFileName);
     if (FileStream.is_open())
     {
-        for (const auto& line : lines)
+        for (const auto& strLine : lines)
         {
-            FileStream << line << "\n";
+            FileStream << strLine << "\n";
         }
 
         FileStream.close();

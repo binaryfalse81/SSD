@@ -2,7 +2,7 @@
 #pragma once
 #include "Header.h"
 #include "SSDDriver.h"
-#include "ShellCommandFactory.h"
+#include "ShellCmdFactory.h"
 
 class Shell
 {
@@ -12,6 +12,6 @@ public:
 
 private:
     SSDDriver* sd;
-    ShellCommandFactory scf;
-    ShellCommand* sc;
+    ShellCmdFactory scf;
+    ShellCmd* sc;
 };

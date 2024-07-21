@@ -18,11 +18,11 @@ private:
     string strBufferFileName{ "buffer.txt" };
     string DataPreFix{ "0x" };
 
-    NAND_DATA ParseCmd(const string &line);
+    NAND_DATA ParseCmd(const string &strLine);
     vector<string> FindLpnData(const UINT32 &nLpn);
-    bool IsInLpn(const UINT32 &nLpn, NAND_DATA& bufferData);
+    bool IsInLpn(const UINT32 &nLpn, NAND_DATA& stNandData);
     VOID StoreCommand(const UINT32& nLpn, const string& strPattern, const UINT32& nSize);
-    VOID CheckFlush(const INT32& bufferSize);
+    VOID CheckFlush(const INT32& nBufSize);
     VOID ReadNAND();
     VOID UpdateNAND(const UINT32& nLpn, const string& strPattern, const UINT32& nSize);
     VOID UpdateMemoryWithBuffer(const vector<string> &lines);

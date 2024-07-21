@@ -1,21 +1,21 @@
 ﻿// Copyright.2024.binaryfalse81@gmail.com
 #include "Header.h"
-#include "ShellCommandFactory.h"
+#include "ShellCmdFactory.h"
 #include "../Logger/Logger.cpp"
 
-ShellCommand* ShellCommandFactory::Make(string strCmd)
+ShellCmd* ShellCmdFactory::Make(string strCmd)
 {
     TokenArgument(strCmd);
     MakeCommand();
     return result;
 }
 
-VOID ShellCommandFactory::SetSsdDriver(SSDDriver* sd)
+VOID ShellCmdFactory::SetSsdDriver(SSDDriver* sd)
 {
     this->sd = sd;
 }
 
-VOID ShellCommandFactory::TokenArgument(string strCmd)
+VOID ShellCmdFactory::TokenArgument(string strCmd)
 {
     LOG_PRINT("Separate commands into tokens");
     string token;
@@ -34,7 +34,7 @@ VOID ShellCommandFactory::TokenArgument(string strCmd)
     CommandToken.push_back(token);
 }
 
-VOID ShellCommandFactory::MakeCommand()
+VOID ShellCmdFactory::MakeCommand()
 {
     LOG_PRINT("Generate the appropriate command");
     if (CommandToken.empty() == true) result = MakeInvalidCommand();
@@ -53,12 +53,12 @@ VOID ShellCommandFactory::MakeCommand()
         result = MakeInvalidCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeInvalidCommand()
+ShellCmd* ShellCmdFactory::MakeInvalidCommand()
 {
     return new InvalidCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeWriteCommand()
+ShellCmd* ShellCmdFactory::MakeWriteCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 3)
@@ -87,7 +87,7 @@ ShellCommand* ShellCommandFactory::MakeWriteCommand()
 }
 
 
-ShellCommand* ShellCommandFactory::MakeReadCommand()
+ShellCmd* ShellCmdFactory::MakeReadCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 2)
@@ -109,7 +109,7 @@ ShellCommand* ShellCommandFactory::MakeReadCommand()
     return new ReadCommand(CommandToken[1]);
 }
 
-ShellCommand* ShellCommandFactory::MakeEraseCommand()
+ShellCmd* ShellCmdFactory::MakeEraseCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 3)
@@ -142,7 +142,7 @@ ShellCommand* ShellCommandFactory::MakeEraseCommand()
     return new EraseCommand(CommandToken[1], CommandToken[2]);
 }
 
-ShellCommand* ShellCommandFactory::MakeEraseRangeCommand()
+ShellCmd* ShellCmdFactory::MakeEraseRangeCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 3)
@@ -176,7 +176,7 @@ ShellCommand* ShellCommandFactory::MakeEraseRangeCommand()
     return new EraseRangeCommand(CommandToken[1], CommandToken[2]);
 }
 
-ShellCommand* ShellCommandFactory::MakeFlushCommand()
+ShellCmd* ShellCmdFactory::MakeFlushCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 1)
@@ -187,7 +187,7 @@ ShellCommand* ShellCommandFactory::MakeFlushCommand()
     return new FlushCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeExitCommand()
+ShellCmd* ShellCmdFactory::MakeExitCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 1)
@@ -198,7 +198,7 @@ ShellCommand* ShellCommandFactory::MakeExitCommand()
     return new ExitCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeFailCommand()
+ShellCmd* ShellCmdFactory::MakeFailCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 1)
@@ -209,7 +209,7 @@ ShellCommand* ShellCommandFactory::MakeFailCommand()
     return new FailCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeHelpCommand()
+ShellCmd* ShellCmdFactory::MakeHelpCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 1)
@@ -220,7 +220,7 @@ ShellCommand* ShellCommandFactory::MakeHelpCommand()
     return new HelpCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeFullWriteCommand()
+ShellCmd* ShellCmdFactory::MakeFullWriteCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 2)
@@ -237,7 +237,7 @@ ShellCommand* ShellCommandFactory::MakeFullWriteCommand()
     return new FullWriteCommand(CommandToken[1]);
 }
 
-ShellCommand* ShellCommandFactory::MakeFullReadCommand()
+ShellCmd* ShellCmdFactory::MakeFullReadCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 1)
@@ -248,7 +248,7 @@ ShellCommand* ShellCommandFactory::MakeFullReadCommand()
     return new FullReadCommand();
 }
 
-ShellCommand* ShellCommandFactory::MakeCompareCommand()
+ShellCmd* ShellCmdFactory::MakeCompareCommand()
 {
     // Check Invalid 1) Argument Length
     if (CommandToken.size() != 1)
@@ -259,7 +259,7 @@ ShellCommand* ShellCommandFactory::MakeCompareCommand()
     return new Compare();
 }
 
-bool ShellCommandFactory::IsStringDecimal(string str)
+bool ShellCmdFactory::IsStringDecimal(string str)
 {
     for (CHAR ch = 0; ch < str.size(); ch++)
     {
@@ -271,7 +271,7 @@ bool ShellCommandFactory::IsStringDecimal(string str)
     return true;
 }
 
-bool ShellCommandFactory::IsStringHexadecimal(string str)
+bool ShellCmdFactory::IsStringHexadecimal(string str)
 {
     if ((str[0] != '0') ||
         (str[1] != 'x') ||
@@ -291,7 +291,7 @@ bool ShellCommandFactory::IsStringHexadecimal(string str)
     return true;
 }
 
-bool ShellCommandFactory::IsStringValidLpn(string str)
+bool ShellCmdFactory::IsStringValidLpn(string str)
 {
     UINT32 nLpn = stoi(str);
     if (nLpn < MAX_LPN)
@@ -301,12 +301,12 @@ bool ShellCommandFactory::IsStringValidLpn(string str)
     return false;
 }
 
-bool ShellCommandFactory::IsStringValidLength(string str)
+bool ShellCmdFactory::IsStringValidLength(string str)
 {
     return (stoi(str) > 0);
 }
 
-bool ShellCommandFactory::IsStringValidLength(string strStartLpn, string strEndLpn)
+bool ShellCmdFactory::IsStringValidLength(string strStartLpn, string strEndLpn)
 {
     return ((stoi(strEndLpn) - stoi(strStartLpn)) > 0);
 }

@@ -3,21 +3,21 @@
 #include "Header.h"
 #include "SSDDriver.h"
 
-class ShellCommand
+class ShellCmd
 {
 public:
      virtual VOID Run(SSDDriver* sd) = 0;
 };
 
 
-class InvalidCommand : public ShellCommand
+class InvalidCommand : public ShellCmd
 {
 public:
     InvalidCommand() {}
     VOID Run(SSDDriver* sd) override;
 };
 
-class WriteCommand : public ShellCommand
+class WriteCommand : public ShellCmd
 {
 public:
     WriteCommand(string strLpn, string strPattern);
@@ -29,7 +29,7 @@ private:
     string strPattern;
 };
 
-class ReadCommand : public ShellCommand
+class ReadCommand : public ShellCmd
 {
 public:
     explicit ReadCommand(string strLpn);
@@ -40,7 +40,7 @@ private:
     string strLpn;
 };
 
-class EraseCommand : public ShellCommand
+class EraseCommand : public ShellCmd
 {
 public:
     EraseCommand(string strStartLpn, string strSize);
@@ -53,7 +53,7 @@ private:
     string strSize;
 };
 
-class EraseRangeCommand : public ShellCommand
+class EraseRangeCommand : public ShellCmd
 {
 public:
     EraseRangeCommand(string strStartLpn, string strEndLpn);
@@ -66,35 +66,35 @@ private:
     string strEndLpn;
 };
 
-class FlushCommand : public ShellCommand
+class FlushCommand : public ShellCmd
 {
 public:
     FlushCommand() {}
     VOID Run(SSDDriver* sd) override;
 };
 
-class ExitCommand : public ShellCommand
+class ExitCommand : public ShellCmd
 {
 public:
     ExitCommand() {}
     VOID Run(SSDDriver* sd) override;
 };
 
-class FailCommand : public ShellCommand
+class FailCommand : public ShellCmd
 {
 public:
     FailCommand() {}
     VOID Run(SSDDriver* sd) override;
 };
 
-class HelpCommand : public ShellCommand
+class HelpCommand : public ShellCmd
 {
 public:
     HelpCommand() {}
     VOID Run(SSDDriver* sd) override;
 };
 
-class FullWriteCommand : public ShellCommand
+class FullWriteCommand : public ShellCmd
 {
 public:
     explicit FullWriteCommand(string strPattern);
@@ -104,14 +104,14 @@ private:
     string strPattern;
 };
 
-class FullReadCommand : public ShellCommand
+class FullReadCommand : public ShellCmd
 {
 public:
     FullReadCommand() {}
     VOID Run(SSDDriver* sd) override;
 };
 
-class Compare : public ShellCommand
+class Compare : public ShellCmd
 {
 public:
     Compare() {}

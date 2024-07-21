@@ -3,13 +3,13 @@
 #include "RealSSDDriver.h"
 #include "../Logger/Logger.cpp"
 
-string UNMAPED_PATTERN = "0x00000000";
+const string UNMAPED_PATTERN = "0x00000000";
 
 RealSSDDriver::RealSSDDriver()
 {
     for (UINT32 nLpn = 0; nLpn < MAX_LPN; nLpn++)
     {
-        cmpBufMgr.SetVerifyPattern(nLpn, UNMAPED_PATTERN);
+        verifyMgr.SetVerifyPattern(nLpn, UNMAPED_PATTERN);
     }
 }
 
@@ -19,11 +19,11 @@ string RealSSDDriver::Read(UINT32 nLpn)
     string cmdLine = "R " + to_string(nLpn);
     SystemCall(cmdLine);
     ifstream ResultFileStream("result.txt");
-    string line;
+    string strLine;
 
     if (ResultFileStream.is_open())
     {
-        getline(ResultFileStream, line);
+        getline(ResultFileStream, strLine);
         ResultFileStream.close();
     }
     else
@@ -31,14 +31,14 @@ string RealSSDDriver::Read(UINT32 nLpn)
             cerr << "result file open error result.txt" << endl;
     }
 
-    return line;
+    return strLine;
 }
 
 VOID RealSSDDriver::Write(UINT32 nLpn, string strPattern)
 {
     LOG_PRINT("Write a data to nLpn");
     string cmdLine = "W " + to_string(nLpn) + " " + strPattern;
-    cmpBufMgr.SetVerifyPattern(nLpn, strPattern);
+    verifyMgr.SetVerifyPattern(nLpn, strPattern);
     SystemCall(cmdLine);
 }
 
@@ -52,7 +52,7 @@ VOID RealSSDDriver::Erase(UINT32 nLpn, UINT32 nSize)
         strCmd += " " + to_string(EraseUnitSize);
         for (UINT32 i = nLpn; i < nLpn + EraseUnitSize; i++)
         {
-            cmpBufMgr.SetVerifyPattern(i, UNMAPED_PATTERN);
+            verifyMgr.SetVerifyPattern(i, UNMAPED_PATTERN);
         }
         SystemCall(strCmd);
         nSize -= EraseUnitSize;
@@ -68,7 +68,7 @@ VOID RealSSDDriver::Flush()
 
 UINT32 RealSSDDriver::Compare()
 {
-    return (UINT32)cmpBufMgr.Verify();
+    return (UINT32)verifyMgr.Verify();
 }
 
 #define SYSTEM_CALL_VER_1   (false)

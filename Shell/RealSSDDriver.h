@@ -16,5 +16,5 @@ public:
 
 private:
     VOID SystemCall(string strCmd);
-    VerifyMgr cmpBufMgr;
+    VerifyMgr verifyMgr;
 };

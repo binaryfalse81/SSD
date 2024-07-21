@@ -16,20 +16,20 @@ typedef struct
     string nLpn;
     string strPattern;
     UINT32 nEraseSize;
-} CMD_INFO;
+} PARSING_RESULT;
 
 class Parser
 {
 public:
-    CMD_INFO* Parse(const string& strCommand);
+    PARSING_RESULT* Parse(const string& strCommand);
 
 private:
     VOID TokenArgument(const string& strCommand);
-    CMD_INFO* UpdateCmdInfo();
-    CMD_INFO* UpdateWriteCmdInfo();
-    CMD_INFO* UpdateReadCmdInfo();
-    CMD_INFO* UpdateEraseCmdInfo();
-    CMD_INFO* UpdateFlushCmdInfo();
+    PARSING_RESULT* UpdateCmdInfo();
+    PARSING_RESULT* UpdateWriteCmdInfo();
+    PARSING_RESULT* UpdateReadCmdInfo();
+    PARSING_RESULT* UpdateEraseCmdInfo();
+    PARSING_RESULT* UpdateFlushCmdInfo();
     VOID CheckWriteCmdToken();
     VOID CheckReadCmdToken();
     VOID CheckEraseCmdToken();

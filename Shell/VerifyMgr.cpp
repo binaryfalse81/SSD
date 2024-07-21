@@ -13,14 +13,14 @@ VOID VerifyMgr::SetVerifyPattern(UINT32 nLpn, string strPattern)
 bool VerifyMgr::Verify()
 {
     ifstream NandFileStream("nand.txt");
-    string line;
+    string strLine;
     UINT32 nLpn = 0;
 
     if (NandFileStream.is_open())
     {
-        while (getline(NandFileStream, line))
+        while (getline(NandFileStream, strLine))
         {
-            NAND_DATA strNandData = Parsing(line);
+            NAND_DATA strNandData = Parsing(strLine);
             if (strNandData.strPattern != astrVerifyPattern[nLpn])
             {
                 return false;

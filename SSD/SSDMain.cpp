@@ -1,29 +1,29 @@
 // Copyright.2024.binaryfalse81@gmail.com
 #include "Header.h"
-#include "SSDCommand.h"
+#include "SSDCmd.h"
 
 string GetConcatenateArgv(INT32 argc, CHAR* argv[])
 {
-    string result{ "" };
+    string strResult{ "" };
     for (INT32 i = 1; i < argc; i++)
     {
-        result = result + " " + string(argv[i]);
+        strResult = strResult + " " + string(argv[i]);
     }
-    return result;
+    return strResult;
 }
 
 INT32 main(INT32 argc, CHAR* argv[])
 {
     Parser parser;
     SSD ssd;
-    CMD_INFO stCmdInfo;
-    SSDCommand cmd{ &ssd, &parser, &stCmdInfo };
-    string arg{ argv[0] };
+    PARSING_RESULT stParsingResult;
+    SSDCmd cmd{ &ssd, &parser, &stParsingResult };
+    string strInputCmd{ argv[0] };
 
-    arg += GetConcatenateArgv(argc, argv);
+    strInputCmd += GetConcatenateArgv(argc, argv);
     try
     {
-        cmd.Run(arg);
+        cmd.Run(strInputCmd);
     }
     catch (...)
     {
@@ -63,10 +63,10 @@ extern "C" __declspec(dllexport) INT32 ExecuteCommand(const wchar_t* cmdLine)
 {
     Parser parser;
     SSD ssd;
-    CMD_INFO stCmdInfo;
-    SSDCommand cmd{ &ssd, &parser, &stCmdInfo };
-    string arg = " " + WideCharToString(cmdLine);
-    cmd.Run(arg);
+    PARSING_RESULT stParsingResult;
+    SSDCmd cmd{ &ssd, &parser, &stParsingResult };
+    string strInputCmd = " " + WideCharToString(cmdLine);
+    cmd.Run(strInputCmd);
     return 0;
 }
 

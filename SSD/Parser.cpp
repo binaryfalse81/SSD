@@ -5,7 +5,7 @@
 
 class ArgsLengthNotMatchException : public exception {};
 
-CMD_INFO *Parser::Parse(const string &strCmd)
+PARSING_RESULT *Parser::Parse(const string &strCmd)
 {
     TokenArgument(strCmd);
     return UpdateCmdInfo();
@@ -29,7 +29,7 @@ VOID Parser::TokenArgument(const string& strCmd)
     astrCmdToken.push_back(token);
 }
 
-CMD_INFO* Parser::UpdateCmdInfo()
+PARSING_RESULT* Parser::UpdateCmdInfo()
 {
     LOG_PRINT("Generate the appropriate command : W/R/E/F");
     if (astrCmdToken[0] == WRITE_CMD) return UpdateWriteCmdInfo();
@@ -39,41 +39,41 @@ CMD_INFO* Parser::UpdateCmdInfo()
     return nullptr;
 }
 
-CMD_INFO *Parser::UpdateWriteCmdInfo()
+PARSING_RESULT *Parser::UpdateWriteCmdInfo()
 {
     CheckWriteCmdToken();
-    CMD_INFO* pstCmdInfo = new CMD_INFO();
-    pstCmdInfo->eCmdType = ENUM_CMD_TYPE::Write;
-    pstCmdInfo->nLpn = astrCmdToken[1];
-    pstCmdInfo->strPattern = astrCmdToken[2];
-    return pstCmdInfo;
+    PARSING_RESULT* pstParsingResult = new PARSING_RESULT();
+    pstParsingResult->eCmdType = ENUM_CMD_TYPE::Write;
+    pstParsingResult->nLpn = astrCmdToken[1];
+    pstParsingResult->strPattern = astrCmdToken[2];
+    return pstParsingResult;
 }
 
-CMD_INFO* Parser::UpdateReadCmdInfo()
+PARSING_RESULT* Parser::UpdateReadCmdInfo()
 {
     CheckReadCmdToken();
-    CMD_INFO* pstCmdInfo = new CMD_INFO();
-    pstCmdInfo->eCmdType = ENUM_CMD_TYPE::Read;
-    pstCmdInfo->nLpn = astrCmdToken[1];
-    return pstCmdInfo;
+    PARSING_RESULT* pstParsingResult = new PARSING_RESULT();
+    pstParsingResult->eCmdType = ENUM_CMD_TYPE::Read;
+    pstParsingResult->nLpn = astrCmdToken[1];
+    return pstParsingResult;
 }
 
-CMD_INFO *Parser::UpdateEraseCmdInfo()
+PARSING_RESULT *Parser::UpdateEraseCmdInfo()
 {
     CheckEraseCmdToken();
-    CMD_INFO * pstCmdInfo = new CMD_INFO();
-    pstCmdInfo->eCmdType = ENUM_CMD_TYPE::Erase;
-    pstCmdInfo->nLpn = astrCmdToken[1];
-    pstCmdInfo->nEraseSize = stoi(astrCmdToken[2]);
-    return pstCmdInfo;
+    PARSING_RESULT * pstParsingResult = new PARSING_RESULT();
+    pstParsingResult->eCmdType = ENUM_CMD_TYPE::Erase;
+    pstParsingResult->nLpn = astrCmdToken[1];
+    pstParsingResult->nEraseSize = stoi(astrCmdToken[2]);
+    return pstParsingResult;
 }
 
-CMD_INFO *Parser::UpdateFlushCmdInfo()
+PARSING_RESULT *Parser::UpdateFlushCmdInfo()
 {
     CheckFlushCmdToken();
-    CMD_INFO * pstCmdInfo = new CMD_INFO();
-    pstCmdInfo->eCmdType = ENUM_CMD_TYPE::Flush;
-    return pstCmdInfo;
+    PARSING_RESULT * pstParsingResult = new PARSING_RESULT();
+    pstParsingResult->eCmdType = ENUM_CMD_TYPE::Flush;
+    return pstParsingResult;
 }
 
 VOID Parser::CheckWriteCmdToken()

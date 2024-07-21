@@ -4,7 +4,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "../SSD/SSD.cpp"
-#include "../SSD/SSDCommand.cpp"
+#include "../SSD/SSDCmd.cpp"
 #include "../SSD/Parser.cpp"
 
 using namespace testing;
@@ -23,29 +23,29 @@ class SSDTestFixture : public testing::Test
 public:
     NiceMock<MockSSD> mockSSD;
     Parser parser;
-    CMD_INFO stCmdInfo;
-    SSDCommand testCmd{ &mockSSD, &parser, &stCmdInfo };
+    PARSING_RESULT stParsingResult;
+    SSDCmd testCmd{ &mockSSD, &parser, &stParsingResult };
     const string UNMAPED_PATTERN = "0x00000000";
 
     SSD ssd;
     string getLSBData(UINT32 nLpn)
     {
-        string line;
+        string strLine;
         ifstream NandFileStream("nand.txt");
 
         if (NandFileStream.is_open())
         {
             for (UINT32 i = 0; i < nLpn; i++)
             {
-                if (!getline(NandFileStream, line))
+                if (!getline(NandFileStream, strLine))
                 {
                     break;
                 }
             }
-            getline(NandFileStream, line);
-            UINT32 LpnDataFIrstIndex = (UINT32)line.find(" ");
+            getline(NandFileStream, strLine);
+            UINT32 LpnDataFIrstIndex = (UINT32)strLine.find(" ");
             NandFileStream.close();
-            return line.substr(LpnDataFIrstIndex + 1);
+            return strLine.substr(LpnDataFIrstIndex + 1);
         }
         return UNMAPED_PATTERN;
     }

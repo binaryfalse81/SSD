@@ -27,7 +27,7 @@ typedef unsigned int    UINT32;
 
 using namespace std;
 
-extern string UNMAPED_PATTERN;
+extern const string UNMAPED_PATTERN;
 
 typedef struct
 {
